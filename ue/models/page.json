@@ -1,0 +1,57 @@
+{
+  "models": [
+    {
+      "id": "page-metadata",
+      "fields": [
+        {
+          "component": "select",
+          "name": "Template",
+          "label": "Template",
+          "options": [
+            {
+              "name": "No Template",
+              "value": ""
+            },
+            {
+              "name": "Homepage",
+              "value": "homepage"
+            },
+            {
+              "name": "Article",
+              "value": "article"
+            },
+            {
+              "name": "Product",
+              "value": "product"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "Title",
+          "label": "Title",
+          "required": true,
+          "validation": {
+            "customErrorMsg": "Page Title is required"
+          }
+        },
+        {
+          "component": "text",
+          "name": "Description",
+          "label": "Description"
+        },
+        {
+          "component": "text",
+          "name": "Robots",
+          "label": "Robots",
+          "description": "Index control via robots"
+        },
+        {
+          "component": "text",
+          "name": "Tags",
+          "label": "Page Tags"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "main",
+    "components": [
+      "section"
+    ]
+  },
+  {
+    "id": "section",
+    "components": [
+      "text",
+      "image",
+      "advanced-accordion",
+      "advanced-carousel",
+      "advanced-tabs",
+      "breadcrumb",
+      "button",
+      "card",
+      "columns",
+      "hero",
+      "table",
+      "teaser"
+    ]
+  },
+  {
+    "id": "homepage-section",
+    "components": [
+      "text",
+      "image",
+      "advanced-carousel",
+      "advanced-tabs",
+      "card",
+      "columns",
+      "hero",
+      "teaser"
+    ]
+  },
+  {
+    "id": "article-section",
+    "components": [
+      "text",
+      "image",
+      "card",
+      "columns",
+      "teaser"
+    ]
+  },
+  {
+    "id": "product-section",
+    "components": [
+      "text",
+      "image",
+      "advanced-tabs",
+      "card",
+      "columns",
+      "hero",
+      "table",
+      "teaser"
+    ]
+  },
+  {
+    "id": "tabs-section",
+    "components": [
+      "text",
+      "image",
+      "card",
+      "button"
+    ]
+  },
+  {
+    "id": "columns",
+    "components": [
+      "columns-row"
+    ]
+  },
+  {
+    "id": "columns-row",
+    "components": []
+  },
+  {
+    "id": "columns-cell",
+    "components": [
+      "text",
+      "image"
+    ]
+  }
+]

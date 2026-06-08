@@ -1,0 +1,31 @@
+{
+  "definitions": [
+    {
+      "title": "Advanced Carousel",
+      "id": "advanced-carousel",
+      "model": "advanced-carousel",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"advanced-carousel\"><div><div><ul><li>Slide 1</li><li>Slide 2</li></ul></div></div></div>",
+          "fields": [
+            { "name": "slides", "selector": "div>div>ul" }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "advanced-carousel",
+      "fields": [
+        {
+          "component": "richtext",
+          "name": "slides",
+          "label": "Slide Names (bullet list)",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}
