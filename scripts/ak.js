@@ -88,16 +88,18 @@ export async function loadBlock(block) {
   return loadExperience(block, 'blocks', name, opts);
 }
 
-function loadTemplate() {
+async function loadTemplate() {
   const meta = getMetadata('template');
   if (!meta) return;
   const template = meta.replaceAll(' ', '-').toLowerCase();
-  const { codeBase } = getConfig();
+  const { codeBase, log } = getConfig();
   document.body.classList.add('has-template');
-  loadStyle(`${codeBase}/templates/${template}/${template}.css`).then(() => {
-    document.body.classList.add(`${template}-template`);
-    document.body.classList.remove('has-template');
-  });
+  await loadStyle(`${codeBase}/templates/${template}/${template}.css`);
+  try {
+    await import(`${codeBase}/templates/${template}/${template}.js`);
+  } catch (e) { await log(e); }
+  document.body.classList.add(`${template}-template`);
+  document.body.classList.remove('has-template');
 }
 
 function decoratePictures(el) {
