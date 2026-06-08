@@ -51,12 +51,17 @@ This file **complements** `AGENTS.md` with project-specific migration and author
 
 Only ask Step 1 questions when the answer isn't obvious (multiple URLs, ambiguous page type, etc.)
 
-**When answers aren't obvious, decide these 4 things with the user:**
+**When answers aren't obvious, decide these 5 things with the user:**
 
 1. **Scope** — Single page or multiple pages? If multiple, which URLs?
 2. **How many templates?** — Analyze the page patterns and recommend how many distinct templates are needed. Pages with the same structure share a template.
 3. **Template name(s)** — Kebab-case, descriptive (e.g., `wknd-landing`, `blog-article`, `adventures`)
 4. **Existing or new?** — Does a template already exist in the repo that covers this page type? Check `PROJECT.md`.
+5. **Asset strategy** — Ask: "How would you like to handle images and media assets?" Options:
+   - **DA Media (default)** — Upload assets directly to DA media storage. Images are referenced by DA URLs and served via EDS CDN. Simplest approach, no external dependencies.
+   - **AEM Assets (DAM)** — Download assets and package into a CRX content package (.zip) for upload to AEM Assets via Package Manager. Preserves folder structure, alt text, and metadata. Use when the project requires AEM DAM governance, Dynamic Media, or Smart Crop.
+   - **Preserve source CDN** — Keep original image URLs pointing to the source CDN (e.g., `cdn-dynmedia-1.microsoft.com`). No asset migration needed, but depends on source CDN staying available. Use for initial migration phases or when source CDN is permanent.
+   - **Hybrid** — Critical/hero assets go to AEM Assets (DAM governance), remaining images go to DA media. Balance governance with simplicity.
 
 ### Step 2: Section Inventory & Block Planning
 
