@@ -13,12 +13,16 @@ function goToSlide(index, carouselList, carouselPanels, prevBtn, nextBtn) {
     button.setAttribute('aria-selected', 'false');
     button.setAttribute('tabindex', '-1');
   });
-  carouselPanels.forEach((sec) => { sec.classList.remove('is-visible'); });
+  carouselPanels.forEach((sec) => {
+    sec.classList.remove('is-visible');
+    sec.setAttribute('aria-hidden', 'true');
+  });
 
   buttons[index].classList.add('is-active');
   buttons[index].setAttribute('aria-selected', 'true');
   buttons[index].setAttribute('tabindex', '0');
   carouselPanels[index]?.classList.add('is-visible');
+  carouselPanels[index]?.setAttribute('aria-hidden', 'false');
 
   const total = carouselPanels.length;
   prevBtn.disabled = index === 0;
@@ -86,6 +90,10 @@ export default function init(el) {
   const instanceId = carouselInstanceId;
   carouselInstanceId += 1;
 
+  el.setAttribute('role', 'region');
+  el.setAttribute('aria-roledescription', 'carousel');
+  el.setAttribute('aria-label', 'Content carousel');
+
   const carousel = el.querySelector('.advanced-carousel ul');
   if (!carousel) {
     log('Please add an unordered list to the advanced carousel block.');
@@ -105,7 +113,9 @@ export default function init(el) {
     sibling.classList.add('carouselSection');
     sibling.id = `carouselpanel-${instanceId}-${carouselPanels.length + 1}`;
     sibling.role = 'tabpanel';
+    sibling.setAttribute('aria-roledescription', 'slide');
     sibling.setAttribute('aria-labelledby', `carousel-${instanceId}-${carouselPanels.length + 1}`);
+    sibling.setAttribute('aria-hidden', carouselPanels.length > 0 ? 'true' : 'false');
     carouselPanels.push(sibling);
     sibling = sibling.nextElementSibling;
   }
