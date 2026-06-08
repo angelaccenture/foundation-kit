@@ -1,14 +1,4 @@
 .teaser {
-  overflow-wrap: break-word;
-  border-radius: 16px;
-  box-shadow: 0 0 2px 0 rgb(0 0 0 / 12%), 0 2px 4px 0 rgb(0 0 0 / 14%);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  background-color: var(--color-surface);
-  color: var(--color-text-dark);
-  cursor: pointer;
-  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
-
   .teaser-inner {
     display: flex;
     flex-direction: column;
@@ -85,11 +75,6 @@
       background-color: var(--color-cta-hover);
       color: var(--color-surface);
     }
-  }
-
-  &:hover {
-    transform: scale(1.005);
-    box-shadow: 0 0 2px 0 rgb(0 0 0 / 14%), 0 4px 8px 0 rgb(0 0 0 / 18%);
   }
 }
 
