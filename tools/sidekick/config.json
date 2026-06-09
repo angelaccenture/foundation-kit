@@ -1,0 +1,17 @@
+{
+  "project": "Foundation Kit",
+  "plugins": [
+    {
+      "id": "quick-edit",
+      "title": "Quick Edit",
+      "environments": ["dev", "preview"],
+      "event": "quick-edit"
+    },
+    {
+      "id": "scheduler",
+      "title": "Scheduler",
+      "environments": ["dev", "preview"],
+      "event": "scheduler"
+    }
+  ]
+}
