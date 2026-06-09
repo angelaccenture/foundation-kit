@@ -279,7 +279,7 @@ function createEditMenu() {
         window.open(`https://da.live/edit#/${owner}/${repo}${pagePath}`, '_blank');
       } else {
         const base = window.location.origin + window.location.pathname;
-        window.location.href = `${base}?${mode}`;
+        window.location.href = `${base}?${mode}=on`;
       }
     });
   });
