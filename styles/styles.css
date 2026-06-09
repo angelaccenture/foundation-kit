@@ -208,7 +208,7 @@ html {
 body {
   margin: 0;
   background-color: var(--color-background);
-  color: red;
+  color: var(--color-text);
   font-family: "Trebuchet MS", sans-serif;
   font-size: var(--body-font-size-m);
   line-height: var(--body-line-height);
