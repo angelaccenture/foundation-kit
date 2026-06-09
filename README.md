@@ -1,5 +1,7 @@
 # Enhancements
 * Updates to Experience Modernization Agent
+* Extended Templates to include template block
+* Updated advanced-tabs for WCAG and tab-count, added advanced-carousel, advanced-accordion and teaser
 
 # Author Kit
 For projects that want a few more batteries. Built by the team who brought you da.live and adobe.com.
