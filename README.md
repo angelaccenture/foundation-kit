@@ -1,5 +1,5 @@
 # Foundation Kit - Expansion Pack for Author Kit
-For projects that want a LOT MORE more batteries. Original Author Kit was built by the team who brought you da.live and adobe.com. Expansion Pack built by Accenture.
+For projects that want a LOT MORE more batteries. Original Author Kit was built by the team who brought you da.live and adobe.com. Expansion Pack built by Accenture & Clients.
 
 ## Getting started
 
