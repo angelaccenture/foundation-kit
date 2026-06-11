@@ -19,14 +19,12 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 1. **Recommended:** Install common npm packages like linting and testing: `npm i`.
 
 ## Features
-
 ### Localization & globalization
-* Language only support - Ex: en, de, hi, ja
-* Region only support - Ex: en-us, en-ca, de-de, de-ch
-* Hybrid support - Ex: en, en-us, de, de-ch, de-at
+* Language only support - Ex: en, de, hi, ja, Region only support - Ex: en-us, en-ca, de-de, de-ch, Hybrid support - Ex: en, en-us, de, de-ch, de-at
 * Fragment-based localized 404s
 * Localized Header & Footer
 * Do not translate support (#_dnt)
+* MSM: https://docs.da.live/about/early-access/multi-site-manager
 
 ### Flexible section authoring
 * Optional containers to constrain content
