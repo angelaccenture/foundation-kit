@@ -309,6 +309,33 @@ Config in `/.da/translate` sheet:
 - `translate.staging` — `on` (staging folder) or `off` (direct)
 - `rollout.behavior` — `overwrite` or `merge` for locale deployment
 
+### Localization App (apps/loc) — Content Inheritance & Rollout
+**Docs:** https://docs.da.live/authors/guides/apps/translation-projects
+**App:** `https://da.live/apps/loc` (launched from `da.live/apps#/{org}/{site}`)
+
+**This is the DA tool for content inheritance/rollout — NOT MSM and NOT the Prepare menu.**
+For inheriting content from a root/source into locale prefixes within ONE site
+(e.g. `/us`, `/eu` under the same repo), this is the correct tool. It creates locale
+folders at the content root and supports merge/overwrite sync so authors can see and
+preserve local edits while pulling base changes. Source content lives at root; locale
+copies live in prefix folders in the SAME site.
+
+**Config:** Reads `/.da/translate` (config + languages sheets). The app's options
+workspace (`apps/loc#/options/{org}`) writes/manages this config — prefer the UI over
+hand-editing. `.da/` config is read from source (auth-gated), saved not published.
+
+**translate.json structure (multi-sheet):**
+- `config` sheet — `key`/`value` rows, e.g. `source.language` = `en`
+- `languages` sheet — `name` (e.g. `en`), `location` (e.g. `/`), `locales` (comma-sep, e.g. `/us, /eu`)
+
+**Workflow:** create project → paste source URLs → validate → set 4 conflict behaviors
+(source sync, translation return, source copy, rollout — each merge/overwrite) →
+pick locales → run → locale folders appear at content root → edit copies → re-run
+with merge to sync changes from base.
+
+**Plugin internals:** `nx/public/plugins/rollout/` imports `mergeCopy`/`overwriteCopy`
+from `nx/blocks/loc/project/`. Project instances stored under `.da/translation/`.
+
 ### Translation Service Connectors
 **Docs:** https://docs.da.live/administrators/guides/setup-translation/translation-service-connection
 
@@ -423,6 +450,13 @@ Base site → satellite inheritance. Satellites inherit content and optionally o
 **Setup:** Edge Delivery Content Provider config + MSM tab in org DA config + Prepare menu entry
 
 **Addresses MSM gap directly.**
+
+> **Note (field finding):** MSM uses SEPARATE satellite sites (separate repos) + the
+> `da-msm` worker + the Prepare menu. The Prepare menu is early-access and must be
+> enabled per-org by Adobe — config sheets alone won't surface it. For locale/inheritance
+> within ONE site (the common "create children from root, edit, sync" workflow), use the
+> **Localization App (apps/loc)** instead — see the Localization section above. Don't
+> confuse the two: MSM = multi-site/multi-domain; apps/loc = locale prefixes in one site.
 
 ### Experience Workspace
 **Docs:** https://docs.da.live/about/early-access/experience-workspace
