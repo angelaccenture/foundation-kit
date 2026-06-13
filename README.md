@@ -20,13 +20,14 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 
 ## ANGEL -- figure out features and how to document
 - Templates -- put templates in there for sheets too, give more details about using the template like a page block
-- Advanced Blocks and "core blocks" -- find soluiton for default text (center, color of one word with tags, etc.)
-- UE, Quick Edit/Layout Mode - Angel to fix QE/LM Cors Issue (Finish Layout Mode, find soluiton for grid)
+- Core Components - Advanced Blocks and "core blocks" -- find soluiton for default text (center, color of one word with tags, etc.)
+- WYSIWYG - UE, Quick Edit
+- Responsive Layout Layouting Mode - Layout Mode - Angel to fix QE/LM Cors Issue (Finish Layout Mode, find soluiton for grid)
 - MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for "live copies" - angel to document
 - Need to find fix for prepare within enviomment -- need to set up defaults (aka preflight, schedule, rollout, etc.)
 - Use MSM for multi content sources  (QA vs Prod)
 - Create Arch diagram for multi envionments, where/why use workers
-- Find/build solution for persistent metadata (example: brand, etc.)
+- Page Properties & Bulk Metadata -- Find/build solution for persistent metadata (example: brand, etc.)
 - Solution for working better with the DAM -- I want to update the alt tag for the image and push that change to the DAM, etc. overwrite of metadata
 - Tagging solution
 - Confirm integrations (Target, Analytics, etc.)
