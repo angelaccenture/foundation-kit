@@ -20,8 +20,8 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 
 ## ANGEL -- figure out features and how to document
 - Templates -- put templates in there for sheets too, give more details about using the template like a page block
-- Advanced Blocks and "core blocks" -- find soluiton for default text (to center, etc.)
-- UE, Quick Edit/Layout Mode - Angel to fix QE/LM Cors Issue
+- Advanced Blocks and "core blocks" -- find soluiton for default text (center, color of one word with tags, etc.)
+- UE, Quick Edit/Layout Mode - Angel to fix QE/LM Cors Issue (Finish Layout Mode, find soluiton for grid)
 - MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for "live copies" - angel to document
 - Need to find fix for prepare within enviomment -- need to set up defaults (aka preflight, schedule, rollout, etc.)
 - Use MSM for multi content sources  (QA vs Prod)
@@ -30,6 +30,7 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 - Solution for working better with the DAM -- I want to update the alt tag for the image and push that change to the DAM, etc. overwrite of metadata
 - Tagging solution
 - Confirm integrations (Target, Analytics, etc.)
+- Solution for better style system - needs to be as good/better
 
 ### Template Support
 * Add template to the metadata
