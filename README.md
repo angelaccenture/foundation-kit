@@ -18,7 +18,17 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 1. Open the `{repo}` folder in your favorite code editor and buil something.
 1. **Recommended:** Install common npm packages like linting and testing: `npm i`.
 
-## Features
+## DEV Set Up Features
+- Templates -- put templates in there for sheets too, give more details about using the template like a page block
+- UE, Quick Edit/Layout Mode
+- MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for language-masters within
+- Use MSM for multi content sources  (QA vs Prod)
+- Create Arch diagram for multi envionments, where/why use workers
+
+### Template Support
+* Add template to the metadata
+* TBD - More Details
+
 ### Localization & globalization
 * Language only support - Ex: en, de, hi, ja, Region only support - Ex: en-us, en-ca, de-de, de-ch, Hybrid support - Ex: en, en-us, de, de-ch, de-at
 * Fragment-based localized 404s
