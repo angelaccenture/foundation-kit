@@ -18,12 +18,14 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 1. Open the `{repo}` folder in your favorite code editor and buil something.
 1. **Recommended:** Install common npm packages like linting and testing: `npm i`.
 
-## DEV Set Up Features
+## ANGEL -- figure out features and how to document
 - Templates -- put templates in there for sheets too, give more details about using the template like a page block
-- UE, Quick Edit/Layout Mode
+- Advanced Blocks and "core blocks" -- find soluiton for default text (to center, etc.)
+- UE, Quick Edit/Layout Mode - Angel to fix QE/LM Cors Issue
 - MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for language-masters within
 - Use MSM for multi content sources  (QA vs Prod)
 - Create Arch diagram for multi envionments, where/why use workers
+- Find/build solution for persistent metadata (example: brand, etc.)
 
 ### Template Support
 * Add template to the metadata
