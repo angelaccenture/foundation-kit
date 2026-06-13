@@ -22,7 +22,8 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 - Templates -- put templates in there for sheets too, give more details about using the template like a page block
 - Advanced Blocks and "core blocks" -- find soluiton for default text (to center, etc.)
 - UE, Quick Edit/Layout Mode - Angel to fix QE/LM Cors Issue
-- MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for language-masters within
+- MSM vs. Translation Roll Out Tool -- Use MSM for multi content sources, trans tool for "live copies" - angel to document
+- Need to find fix for prepare within enviomment -- need to set up defaults (aka preflight, schedule, rollout, etc.)
 - Use MSM for multi content sources  (QA vs Prod)
 - Create Arch diagram for multi envionments, where/why use workers
 - Find/build solution for persistent metadata (example: brand, etc.)
