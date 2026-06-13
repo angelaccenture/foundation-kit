@@ -26,6 +26,9 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 - Use MSM for multi content sources  (QA vs Prod)
 - Create Arch diagram for multi envionments, where/why use workers
 - Find/build solution for persistent metadata (example: brand, etc.)
+- Solution for working better with the DAM -- I want to update the alt tag for the image and push that change to the DAM, etc. overwrite of metadata
+- Tagging solution
+- Confirm integrations (Target, Analytics, etc.)
 
 ### Template Support
 * Add template to the metadata
