@@ -27,7 +27,7 @@ For projects that want a LOT MORE more batteries. Original Author Kit was built 
 - Need to find fix for prepare within enviomment -- need to set up defaults (aka preflight, schedule, rollout, etc.)
 - Use MSM for multi content sources  (QA vs Prod)
 - Create Arch diagram for multi envionments, where/why use workers (block language-masters)
-- Page Properties & Bulk Metadata -- Find/build solution for persistent metadata (example: brand, etc.)
+- Page Properties & Bulk Metadata -- Find/build solution for persistent metadata (example: brand, etc.) -- global var (not shown on every page)
 - Solution for working better with the DAM -- I want to update the alt tag for the image and push that change to the DAM, etc. overwrite of metadata
 - Tagging solution
 - Confirm integrations (Target, Analytics, etc.)
