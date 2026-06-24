@@ -1,0 +1,54 @@
+{
+  "definitions": [
+    {
+      "title": "Accordion",
+      "id": "advanced-accordion",
+      "model": "advanced-accordion",
+      "filter": "advanced-accordion",
+      "plugins": {
+        "da": {
+          "unsafeHTML": "<div class=\"advanced-accordion\"><div><ul><li>Accordion Item 1</li></ul></div></div>",
+          "fields": [
+             {
+              "name": "tablistall",
+              "selector": "div>div>ul>li"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "advanced-accordion",
+      "fields": [
+        {
+          "component": "multiselect",
+          "name": "classes",
+          "label": "Style",
+          "options": [
+           {
+              "name": "Standard",
+              "value": "standard"
+            },
+            {
+              "name": "Blue Standard",
+              "value": "bluestandard"
+            }            
+          ]
+        },
+        {
+          "component": "richtext",
+          "valueType": "string",
+          "name": "tablistall",
+          "label": "Fix These Later"
+        }
+      ]
+    }
+  ],
+  "filters": [ {
+      "id": "advanced-accordion",
+      "components": [
+      ]
+    }]
+}

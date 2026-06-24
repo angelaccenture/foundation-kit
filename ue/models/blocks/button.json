@@ -1,0 +1,66 @@
+{
+  "definitions": [
+    {
+      "title": "Button",
+      "id": "button",
+      "model": "button",
+      "plugins": {
+        "da": {
+        "unsafeHTML": "<div class=\"button primary\"><div><div><a href=\"http://www.linkgoeshere.com\" title=\"Aria Label\">Button Text</a></div></div></div>",
+        "fields": [
+            {
+              "name": "text",
+              "selector": "div>p>a"
+            },
+            {
+              "name": "link",
+              "selector": "div>p>a[href]"
+            },
+            {
+              "name": "label",
+              "selector": "div>p>a[title]"
+            }
+          ]   
+      }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "button",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "options": [
+           { "name": "Primary", "value": "primary" },
+            { "name": "Secondary", "value": "secondary" },
+            { "name": "Text Button", "value": "text-btn" },
+            { "name": "Input",        "value": "primary-variant" },
+            { "name": "Input Secondary", "value": "secondary-variant" }   
+          ]
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "text",
+          "label": "Display Text"
+        },
+        {
+          "component": "text",
+          "name": "link",
+          "label": "URL",
+          "valueType": "string"
+        },
+         {
+          "component": "text",
+          "name": "label",
+          "label": "Title",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

@@ -1,0 +1,91 @@
+{
+  "definitions": [
+    {
+      "title": "Teaser",
+      "id": "teaser",
+       "model": "teaser",
+      "plugins": {
+        "da": {
+        "unsafeHTML": "<div class=\"teaser\"><div><div><picture><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><source type=\"image/webp\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\"><source type=\"image/jpeg\" srcset=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" media=\"(min-width: 600px)\"><img loading=\"lazy\" alt=\"Alt Text\" src=\"https://sidekick-library--aem-block-collection--adobe.aem.live/media_1300083772e9645ea9463e3ff16e3a87fec824b7c.jpg\" width=\"3840\" height=\"2160\"></picture></div></div><div><div><p><strong>Unmatched speed</strong></p><p>AEM is the fastest way to publish, create, and serve websites.</p></div></div></div>",
+         "fields": [
+           {
+              "name": "image",
+              "selector": "div>div>picture>img[src]"
+            },
+            {
+              "name": "imageAlt",
+              "selector": "div>div>picture>img[alt]"
+            },
+            {
+              "name": "title",
+              "selector": "div:nth-child(2)>div>p>strong"
+            },
+            {
+              "name": "text",
+              "selector": "div:nth-child(2)>div>p:nth-child(2)"
+            }
+          ]
+      }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "teaser",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Style",
+          "value": "left",
+          "options": [
+           {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            }            
+          ]
+        },
+         {
+          "component": "reference",
+          "valueType": "string",
+          "name": "image",
+          "label": "Image",
+          "required": true,
+          "multi": false,
+           "validation": {
+              "customErrorMsg": "Image is required"
+          }
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "imageAlt",
+          "label": "Image Alt",
+          "required": true,
+          "multi": false,
+           "validation": {
+              "customErrorMsg": "Alt Text is required"
+          }
+        },
+        {
+          "component": "text",
+          "name": "title",
+          "value": "",
+          "label": "Title",
+          "valueType": "string"
+        }, {
+          "component": "richtext",
+          "name": "text",
+          "value": "",
+          "label": "Text",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": []
+}

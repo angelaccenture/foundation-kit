@@ -1,0 +1,28 @@
+{
+  "options": [
+    {
+      "name": "Primary",
+      "value": "primary"
+    },
+    {
+      "name": "Secondary",
+      "value": "secondary"
+    },
+    {
+      "name": "Input Primary",
+      "value": "primary-variant"
+    },
+    {
+      "name": "Input Secondary",
+      "value": "secondary-variant"
+    },
+    {
+      "name": "Text",
+      "value": "text-btn"
+    },
+    {
+      "name": "Link",
+      "value": "link-btn"
+    }
+  ]
+}

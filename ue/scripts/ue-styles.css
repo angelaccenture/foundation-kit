@@ -1,0 +1,8 @@
+.layoutmode {
+ background: lightblue linear-gradient(45deg, #800080 25%, transparent 25%, transparent 50%, #800080 50%, #800080 75%, transparent 75%, #fff, transparent 25px, transparent 41px);
+ background-size: 4px 4px;
+}
+.layoutmode .block-content div {
+  filter: invert(25%) sepia(1) saturate(10) hue-rotate(200deg);
+  background-color: #90D5FF;
+}
