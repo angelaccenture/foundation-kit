@@ -36,7 +36,7 @@
   transform: rotate(45deg);
   transition: transform 0.2s;
   flex-shrink: 0;
-  margin-left: 16px;
+  margin-inline-start: 16px;
 }
 
 .advanced-accordion details[open] summary::after {

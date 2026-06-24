@@ -156,3 +156,8 @@
   left: calc(50% + 1px);
   transform: translate(-50%, -50%);
 }
+
+/* RTL: mirror the prev/next navigation so arrows point the natural reading direction */
+[dir="rtl"] .advanced-carousel .carousel-navigation-buttons {
+  flex-direction: row-reverse;
+}
