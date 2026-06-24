@@ -1,4 +1,6 @@
 import { loadPage } from '../../scripts/scripts.js';
+import injectToolbarButtons from './toolbar-buttons.js';
+import initContentEditor from './content-editor.js';
 
 const importMap = {
   imports: {
@@ -14,12 +16,16 @@ function addImportmap() {
   document.head.appendChild(importmapEl);
 }
 
-async function loadMoudle(origin, payload) {
+async function loadModule(origin, payload) {
   const { default: loadQuickEdit } = await import(`${origin}/nx/public/plugins/quick-edit/quick-edit.js`);
+  initContentEditor();
+
+  const observer = new MutationObserver(injectToolbarButtons);
+  observer.observe(document.body, { childList: true, subtree: true });
+
   loadQuickEdit(payload, loadPage);
 }
 
-// creates sidekick payload when loading QE from query param
 function generateSidekickPayload() {
   let { hostname } = window.location;
   if (hostname === 'localhost') {
@@ -40,9 +46,9 @@ export default function init(payload) {
   const { search } = window.location;
   const ref = new URLSearchParams(search).get('quick-edit');
   let origin;
-  if (ref === 'on' || !ref) origin = 'https://da.live';
+  if (ref === 'on' || !ref) origin = 'https://main--da-nx--adobe.aem.live';
   if (ref === 'local') origin = 'http://localhost:6456';
   if (!origin) origin = `https://${ref}--da-nx--adobe.aem.live`;
   addImportmap();
-  loadMoudle(origin, payload || generateSidekickPayload());
+  loadModule(origin, payload || generateSidekickPayload());
 }

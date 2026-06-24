@@ -1,0 +1,104 @@
+{
+  "defaults": {
+    "blocks": {
+      "*": {
+        "actions": ["move-up", "move-down", "delete"]
+      },
+      "hero": {
+        "label": "Hero",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/hero" }
+        ]
+      },
+      "card": {
+        "label": "Card",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/card" }
+        ]
+      },
+      "teaser": {
+        "label": "Teaser",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/teaser" }
+        ]
+      },
+      "columns": {
+        "label": "Columns",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/columns" }
+        ]
+      },
+      "advanced-accordion": {
+        "label": "Accordion",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-accordion" }
+        ]
+      },
+      "advanced-carousel": {
+        "label": "Carousel",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-carousel" }
+        ]
+      },
+      "advanced-tabs": {
+        "label": "Tabs",
+        "properties": [
+          { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/advanced-tabs" }
+        ]
+      }
+    },
+    "sections": {
+      "actions": ["add-block", "move-up", "move-down", "delete"],
+      "properties": [
+        { "name": "classes", "type": "multi-select", "source": "da", "path": "/docs/library/styles/sections" },
+        { "name": "grid", "label": "Grid", "type": "select", "options": ["none", "2", "3", "4", "5", "6"], "prefix": "grid-" },
+        { "name": "gap", "label": "Gap", "type": "select", "options": ["none", "xs", "s", "m", "l", "xl", "xxl"], "prefix": "gap-" },
+        { "name": "spacing", "label": "Spacing", "type": "select", "options": ["none", "xs", "s", "m", "l", "xl", "xxl"], "prefix": "spacing-" },
+        { "name": "container", "label": "Container", "type": "select", "options": ["none", "2", "4", "6"], "prefix": "container-" },
+        { "name": "layout", "label": "Layout", "type": "select", "options": ["none", "bento"], "prefix": "layout-" }
+      ]
+    }
+  },
+  "templates": {
+    "blog": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete"]
+        }
+      },
+      "sections": {
+        "properties": [
+          { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
+          { "name": "spacing", "type": "select", "options": ["none", "s", "m", "l"] }
+        ]
+      }
+    },
+    "homepage": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete", "add-block"]
+        },
+        "hero": {
+          "variants": ["center", "dark", "video"],
+          "properties": [
+            { "name": "style", "type": "select", "options": ["default", "center", "dark", "video"] }
+          ]
+        }
+      }
+    },
+    "product": {
+      "blocks": {
+        "*": {
+          "actions": ["move-up", "move-down", "delete"]
+        }
+      },
+      "sections": {
+        "properties": [
+          { "name": "style", "type": "multi-select", "source": "da", "path": "/config/section-styles" },
+          { "name": "grid", "type": "select", "options": ["none", "2", "3", "4"] },
+          { "name": "spacing", "type": "select", "options": ["none", "s", "m", "l", "xl"] }
+        ]
+      }
+    }
+  }
+}
