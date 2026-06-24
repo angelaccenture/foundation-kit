@@ -1,3 +1,8 @@
+Additional Features:
+1. RTL Support
+2. Enhanced Advanced Tabs, New Advanced Carousel, New Adanced Accordion
+3. 
+
 # Author Kit
 For projects that want a few more batteries. Built by the team who brought you da.live and adobe.com.
 
