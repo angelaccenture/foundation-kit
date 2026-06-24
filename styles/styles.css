@@ -389,3 +389,7 @@ aem-sidekick {
     opacity: 1;
   }
 }
+
+[dir="rtl"] {
+  text-align: right;
+} 

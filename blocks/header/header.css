@@ -364,3 +364,20 @@ header {
     }
   }
 }
+
+/*
+ * RTL support
+ * The header uses CSS grid named areas ("brand nav actions"), which the browser
+ * mirrors automatically under dir="rtl" — so the major layout flips correctly.
+ * The icon-inset nudges below use physical `right:` offsets; mirror them to `left:`
+ * for RTL. These are fine-tuning values — verify visually with real nav content.
+ */
+[dir="rtl"] header nav .action-wrapper {
+  right: auto;
+  left: -23px;
+}
+
+[dir="rtl"] header nav .actions-section .action-wrapper {
+  right: auto;
+  left: -13px;
+}
