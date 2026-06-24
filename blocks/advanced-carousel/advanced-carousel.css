@@ -1,0 +1,158 @@
+.advanced-carousel {
+  position: relative;
+}
+
+/* Hide all panels, show only the active one */
+.advanced-carousel [role="tabpanel"] {
+  display: none;
+}
+
+.advanced-carousel [role="tabpanel"].is-visible {
+  display: block;
+}
+
+/* Navigation bar — prev, indicators, play/pause, next */
+.advanced-carousel .carousel-navigation-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+/* Prev/Next buttons */
+.advanced-carousel .carousel-navigation-buttons > button {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-gray-200, #e0e0e0);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.advanced-carousel .carousel-navigation-buttons > button:hover,
+.advanced-carousel .carousel-navigation-buttons > button:focus-visible {
+  background-color: var(--color-gray-300, #ccc);
+}
+
+.advanced-carousel .carousel-navigation-buttons > button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Arrow icons */
+.advanced-carousel .carousel-navigation-buttons > button::after {
+  display: block;
+  content: '';
+  border: 2px solid var(--color-text, #000);
+  border-bottom: 0;
+  border-left: 0;
+  height: 8px;
+  width: 8px;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 2px);
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.advanced-carousel .carousel-navigation-buttons > button.slide-next::after {
+  transform: translate(-50%, -50%) rotate(45deg);
+  left: calc(50% - 2px);
+}
+
+/* Dot indicators */
+.advanced-carousel .carousel-slide-indicators {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.advanced-carousel .carousel-slide-indicator button {
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--color-gray-200, #dadada);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0;
+  color: transparent;
+  overflow: hidden;
+}
+
+.advanced-carousel .carousel-slide-indicator button::after {
+  content: none;
+}
+
+.advanced-carousel .carousel-slide-indicator button.is-active,
+.advanced-carousel .carousel-slide-indicator button:hover,
+.advanced-carousel .carousel-slide-indicator button:focus-visible {
+  background-color: var(--color-text, #000);
+}
+
+/* Play/pause button */
+.advanced-carousel .carousel-play-pause {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: 2px solid var(--color-text, #000);
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+.advanced-carousel .carousel-play-pause:hover,
+.advanced-carousel .carousel-play-pause:focus-visible {
+  background-color: rgb(0 0 0 / 10%);
+}
+
+/* Pause icon (two bars) */
+.advanced-carousel .carousel-play-pause.is-playing::before,
+.advanced-carousel .carousel-play-pause.is-playing::after {
+  content: '';
+  display: block;
+  width: 2px;
+  height: 10px;
+  background-color: var(--color-text, #000);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.advanced-carousel .carousel-play-pause.is-playing::before {
+  left: calc(50% - 3px);
+}
+
+.advanced-carousel .carousel-play-pause.is-playing::after {
+  left: calc(50% + 1px);
+}
+
+/* Play icon (triangle) */
+.advanced-carousel .carousel-play-pause:not(.is-playing)::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 9px;
+  border-color: transparent transparent transparent var(--color-text, #000);
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 1px);
+  transform: translate(-50%, -50%);
+}
