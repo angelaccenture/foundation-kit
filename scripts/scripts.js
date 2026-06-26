@@ -46,9 +46,10 @@ await loadPage();
 
 (function da() {
   const { searchParams } = new URL(window.location.href);
- const hasPreview = searchParams.has('dapreview');
+  const hasPreview = searchParams.has('dapreview');
   if (hasPreview) import('../tools/da/da.js').then((mod) => mod.default(loadPage));
   const hasQE = searchParams.has('quick-edit');
   if (hasQE) import('../tools/quick-edit/quick-edit.js').then((mod) => mod.default());
-  
+  const hasLayoutMode = searchParams.has('layout-mode');
+  if (hasLayoutMode) import('../tools/quick-edit/layout-mode.js').then((mod) => mod.default());
 }());
