@@ -23,11 +23,22 @@ function getHostParts() {
   return { owner, repo };
 }
 
+function getStylesUrl(path) {
+  // On localhost the dev server can't serve the styles sheet, so resolve it
+  // against the derived aem.page host. On every real host (preview.da.live,
+  // aem.page, aem.live) the sheet lives on the page's own origin, so a
+  // same-origin relative fetch avoids cross-origin CORS failures.
+  if (window.location.hostname === 'localhost') {
+    const { owner, repo } = getHostParts();
+    return `https://main--${repo}--${owner}.aem.page${path}.json`;
+  }
+  return `${path}.json`;
+}
+
 async function fetchDAOptions(path) {
   if (daCache[path]) return daCache[path];
   try {
-    const { owner, repo } = getHostParts();
-    const resp = await fetch(`https://main--${repo}--${owner}.aem.page${path}.json`);
+    const resp = await fetch(getStylesUrl(path));
     if (!resp.ok) throw new Error(`DA fetch failed: ${resp.status}`);
     const json = await resp.json();
     if (!json.data) { daCache[path] = []; return []; }

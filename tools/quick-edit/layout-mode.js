@@ -672,14 +672,17 @@ function applyLayoutModeUI() {
   async function fetchBlockList() {
     if (blockListCache) return blockListCache;
     try {
-      let { hostname } = window.location;
-      if (hostname === 'localhost') {
+      // On localhost resolve against the derived aem.page host; on every real
+      // host (preview.da.live, aem.page, aem.live) the block list lives on the
+      // page's own origin, so a same-origin relative URL avoids CORS failures.
+      let baseUrl = '/docs/library/block-list';
+      if (window.location.hostname === 'localhost') {
         const meta = document.querySelector('meta[property="hlx:proxyUrl"]');
-        if (meta) hostname = meta.content;
+        const hostname = meta ? meta.content : window.location.hostname;
+        const parts = hostname.split('.')[0].split('--');
+        const [, repo, owner] = parts;
+        baseUrl = `https://main--${repo}--${owner}.aem.page/docs/library/block-list`;
       }
-      const parts = hostname.split('.')[0].split('--');
-      const [, repo, owner] = parts;
-      const baseUrl = `https://main--${repo}--${owner}.aem.page/docs/library/block-list`;
 
       // Check for template-specific block list first
       const templateMeta = document.head.querySelector('meta[name="template"]');
