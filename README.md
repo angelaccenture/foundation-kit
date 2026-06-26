@@ -1,7 +1,8 @@
 Additional Features:
 1. RTL Support
 2. Enhanced Advanced Tabs, New Advanced Carousel, New Adanced Accordion
-3. 
+3. IP - Core Blocks -- Teaser, Advanced-Text (maybe button, TBD)
+4. IP - Enhanced Quick Edit (for layout mode)
 
 # Author Kit
 For projects that want a few more batteries. Built by the team who brought you da.live and adobe.com.
