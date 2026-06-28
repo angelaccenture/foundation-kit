@@ -1,8 +1,8 @@
 Additional Features:
 1. RTL Support
 2. Enhanced Advanced Tabs, New Advanced Carousel, New Adanced Accordion
-3. IP - Core Blocks -- Teaser, Advanced-Text (maybe button, TBD)
-4. IP - Full Template Support
+3. Block Template Support (to use template as page component - for layout and to lessen the use of custom blocks)
+4. IP - Core Blocks -- Teaser, Advanced-Text (maybe button, TBD)
 5. IP - Enhanced Quick Edit (for layout mode)
 
 # Author Kit
