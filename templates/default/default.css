@@ -1,0 +1,6 @@
+/* Styles scoped to the "default" template.
+   Applied when a page has `Template: default` metadata.
+   ak.js adds the `default-template` class to <body>. */
+.default-template {
+  /* template-specific styles here */
+}
