@@ -57,48 +57,21 @@ export async function loadStyle(href) {
   });
 }
 
-/**
- * Reads a comma-separated block list from a <meta> in the child's head.html.
- * Powers the AEM-overlay-style block override system:
- *   block-extend  → child CSS loads IN ADDITION to FED's (child wins cascade),
- *                   FED's JS is kept. (~ sling:resourceSuperType)
- *   block-replace → child CSS *and* JS load from the child's OWN origin,
- *                   FED's copy is ignored entirely. (~ sling:resourceType)
- * A block not named in either meta loads only from FED (no extra requests).
- */
-function getBlockOverride(name) {
-  const listed = (metaName) => (getMetadata(metaName) || '')
-    .split(',').map((s) => s.trim()).filter(Boolean).includes(name);
-  if (listed('block-replace')) return 'replace';
-  if (listed('block-extend')) return 'extend';
-  return null;
-}
-
 export async function loadExperience(el, type, name, opts) {
   const { codeBase, log } = getConfig();
-  const override = type === 'blocks' ? getBlockOverride(name) : null;
-  // FED (/libs) path vs. the child's own same-origin path.
-  const fedPath = `${codeBase}/${type}/${name}/${name}`;
-  const childPath = `/${type}/${name}/${name}`;
-  // replace → run entirely from the child; otherwise decorate/style from FED.
-  const jsPath = override === 'replace' ? childPath : fedPath;
+  const path = `${codeBase}/${type}/${name}/${name}`;
   const loading = [];
   if (opts.decorate) {
     loading.push(new Promise((resolve) => {
       (async () => {
         try {
-          await (await import(`${jsPath}.js`)).default(el);
+          await (await import(`${path}.js`)).default(el);
         } catch (ex) { await log(ex, el); }
         resolve();
       })();
     }));
   }
-  if (opts.style) {
-    // replace loads only the child's CSS; extend loads FED base THEN child
-    // (child link is appended second, so it wins at equal specificity).
-    if (override !== 'replace') loading.push(loadStyle(`${fedPath}.css`));
-    if (override) loading.push(loadStyle(`${childPath}.css`));
-  }
+  if (opts.style) loading.push(loadStyle(`${path}.css`));
   await Promise.all(loading);
   return el;
 }
