@@ -14,6 +14,9 @@ async function loadSidekick() {
   import('./utils/favicon.js');
   import('./utils/footer.js').then(({ default: footer }) => footer());
 
+  // Consent gate: loads analytics/martech only once consent is granted.
+  import('./consent-check.js');
+
   // Author facing tools
   if (ENV !== 'prod') {
     import('../tools/scheduler/scheduler.js');
