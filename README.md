@@ -74,6 +74,11 @@ For projects that want a few more batteries. Built by the team who brought you d
 ### Performance
 * Extensible LCP detection
 
+### Privacy & consent
+* Consent-gated script loading (analytics/martech load only after consent)
+* Default-decline until a CMP grants permission
+* `?consent=accept|decline` test override; `consent-update` event hook for a real CMP
+
 ### Developer tools
 * Environment detection
 * Extensible logging (console, coralogix, splunk, etc.)
@@ -125,3 +130,51 @@ blue, gray, green, magenta, organge, red, purple, yellow
 
 ### Color schemes
 light, dark
+
+
+## Consent-gated script loading
+
+Analytics, marketing, and other tracking scripts load **only after** a visitor
+grants consent. `scripts/consent-check.js` is a default-decline gate wired into
+the lazy phase; consent-required scripts live in `scripts/consented.js` and are
+imported once permission is granted.
+
+### User story
+
+**As a** privacy/compliance owner for a site built on the foundation kit,
+**I want** analytics, marketing, and other tracking scripts to load *only after*
+a visitor has granted consent,
+**so that** we don't drop tracking cookies or send data to third parties before
+the user agrees — keeping the site compliant with GDPR, ePrivacy, CPRA, and
+similar regulations by default.
+
+#### Context
+Out of the box, most EDS sites fire their delayed scripts (Adobe Analytics, GTM,
+marketing pixels) on a timer regardless of consent. For clients in regulated
+industries — healthcare, finance, EU-facing brands — that's a compliance risk
+from the very first page load. This feature flips the default to *decline until
+told otherwise*, so a new site is compliant on day one and tracking is wired in
+deliberately.
+
+#### Acceptance criteria
+* **Given** a visitor who has not made a consent choice, **when** the page loads,
+  **then** no consent-gated scripts run (default is declined).
+* **Given** a visitor grants consent, **when** the CMP calls `onConsentUpdate()`,
+  **then** the consented scripts load exactly once and a `consent-update` event
+  fires for other listeners.
+* **Given** a developer testing locally, **when** they append `?consent=accept`,
+  **then** the gated scripts load — and `?consent=decline` keeps them off —
+  without needing a live CMP.
+* **Given** consent scripts have already loaded, **when** consent updates again,
+  **then** they are not loaded twice.
+
+#### Who benefits
+* **Compliance/Legal** — default-safe posture, defensible in an audit.
+* **Developers** — one clear place (`consented.js`) to drop tracking, and a
+  documented CMP hook (`onConsentUpdate()`) instead of ad-hoc timers.
+* **Marketing** — still gets analytics, correctly gated so collected data is
+  consented and clean.
+
+#### When to reach for it
+Any project where a client asks *"does our tracking respect the cookie banner?"*
+— especially healthcare, EU/UK audiences, or enterprise legal review.
