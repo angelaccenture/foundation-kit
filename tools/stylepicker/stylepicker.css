@@ -43,7 +43,7 @@
 
 /* Standalone tool shell */
 [data-style-picker-app] {
-  max-width: 40rem;
+  max-width: 60rem;
   margin: 0 auto;
   padding: 2rem 1.5rem;
   font-family: system-ui, -apple-system, sans-serif;
@@ -258,4 +258,73 @@
   border-radius: 6px;
   background: #f4f4f5;
   font-size: 0.85rem;
+}
+
+/* Two-column layout: composer left, live preview right */
+.style-picker-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (width >= 860px) {
+  .style-picker-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .style-picker-col-right {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.style-picker-preview-panel {
+  margin-top: 0.4rem;
+  padding: 1rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  background:
+    repeating-conic-gradient(#f4f4f5 0% 25%, #fff 0% 50%) 0 / 20px 20px;
+  min-height: 12rem;
+  display: flex;
+}
+
+/* The mock block sample */
+.style-picker-sample {
+  flex: 1;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #18181b;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+}
+
+.style-picker-sample-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.style-picker-sample-heading {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+}
+
+.style-picker-sample-body {
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.style-picker-sample-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: #18181b;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
 }

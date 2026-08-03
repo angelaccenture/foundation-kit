@@ -252,10 +252,82 @@ function renderComposer(container, blockName, blockKey, sheet, colorPicker) {
   update();
 }
 
+/**
+ * Draw a mock block in the right column, styled from the composed values.
+ * Field Names are matched fuzzily (background/foreground/accent/…); anything
+ * colorish is applied, alignment + font-size are honoured. This is a generic
+ * card/section mock — enough to see the style take shape live.
+ * @param {Element} panel
+ * @param {string} blockName
+ * @param {Record<string,string>} values
+ */
+function renderBlockPreview(panel, blockName, values) {
+  const get = (...needles) => {
+    const key = Object.keys(values).find((k) => {
+      const slug = toKey(k);
+      return needles.every((n) => slug.includes(n));
+    });
+    return key ? values[key] : '';
+  };
+  const bg = get('background');
+  const fg = get('foreground');
+  const accent = get('accent');
+  const align = toKey(get('horizontal', 'align')) || 'left';
+  const size = toKey(get('font', 'size')) || toKey(get('font')) || '';
+  const sizeMap = {
+    s: '0.9rem', m: '1.05rem', l: '1.35rem', small: '0.9rem', medium: '1.05rem', large: '1.35rem',
+  };
+
+  panel.innerHTML = '';
+  const sample = document.createElement('div');
+  sample.className = 'style-picker-sample';
+  if (bg) sample.style.background = bg;
+  if (fg) sample.style.color = fg;
+  if (sizeMap[size]) sample.style.fontSize = sizeMap[size];
+  sample.style.textAlign = ['left', 'center', 'right'].includes(align) ? align : 'left';
+
+  const kicker = document.createElement('p');
+  kicker.className = 'style-picker-sample-kicker';
+  kicker.textContent = blockName;
+  const h = document.createElement('h3');
+  h.className = 'style-picker-sample-heading';
+  h.textContent = 'Sample heading';
+  if (accent) h.style.color = accent;
+  const body = document.createElement('p');
+  body.className = 'style-picker-sample-body';
+  body.textContent = 'This is a live preview of your composed style. Pick options on the left and watch it update.';
+  const btn = document.createElement('span');
+  btn.className = 'style-picker-sample-btn';
+  btn.textContent = 'Call to action';
+  if (accent) {
+    btn.style.background = accent;
+    btn.style.color = '#fff';
+  }
+
+  sample.append(kicker, h, body, btn);
+  panel.append(sample);
+}
+
 /** @param {Element} host */
 export default async function decorate(host) {
   host.classList.add('style-picker');
   host.textContent = '';
+
+  // Two-column layout: composer (left), live preview (right).
+  const layout = document.createElement('div');
+  layout.className = 'style-picker-layout';
+  const leftCol = document.createElement('div');
+  leftCol.className = 'style-picker-col style-picker-col-left';
+  const rightCol = document.createElement('div');
+  rightCol.className = 'style-picker-col style-picker-col-right';
+
+  const previewHeading = document.createElement('span');
+  previewHeading.className = 'style-picker-summary-label';
+  previewHeading.textContent = 'Block preview';
+  const previewPanel = document.createElement('div');
+  previewPanel.className = 'style-picker-preview-panel';
+  previewPanel.innerHTML = '<p class="style-picker-preview-hint">Choose a block and compose a style to preview it here.</p>';
+  rightCol.append(previewHeading, previewPanel);
 
   const label = document.createElement('label');
   label.className = 'style-picker-label';
@@ -269,7 +341,15 @@ export default async function decorate(host) {
   const results = document.createElement('div');
   results.className = 'style-picker-results';
 
-  host.append(label, status);
+  leftCol.append(label, status);
+  layout.append(leftCol, rightCol);
+  host.append(layout);
+
+  // Live preview updates whenever the composer emits a change.
+  let currentBlockName = '';
+  host.addEventListener('style-compose-change', (e) => {
+    renderBlockPreview(previewPanel, currentBlockName, e.detail.values || {});
+  });
 
   // Reuse David's colour picker (already in the repo).
   const { ColorPicker } = await import('../design-tokens/color-picker.js');
@@ -286,19 +366,21 @@ export default async function decorate(host) {
     retry.className = 'style-picker-retry';
     retry.textContent = 'Retry';
     retry.addEventListener('click', () => decorate(host));
-    host.append(retry);
+    leftCol.append(retry);
     return;
   }
 
   const select = buildBlockSelect(blocks);
   status.remove();
-  host.append(select, results);
+  leftCol.append(select, results);
 
   select.addEventListener('change', async () => {
     const blockName = select.selectedOptions[0]?.textContent || '';
+    currentBlockName = blockName;
     const blockKey = select.value;
     if (!blockKey) return;
     results.innerHTML = '<p class="style-picker-status">Loading form…</p>';
+    previewPanel.innerHTML = '<p class="style-picker-preview-hint">Compose a style to preview it.</p>';
     try {
       const sheet = await loadBlockSheet(blockKey);
       renderComposer(results, blockName, blockKey, sheet, colorPicker);
