@@ -1,231 +1,244 @@
 /*
- * Style Picker — dropdown of blocks, read from the published library sheet at
- * /docs/library/blocks.json. Same-origin + published = no auth, no CORS, no
- * admin.da.live. The sheet is a multi-sheet workbook:
- *   • "data"    → one row per block  { name, path, … }
- *   • "options" → style options      { key, blocks, values }
- * Pick a block and its style options (rows in "options" whose `blocks` matches)
- * are listed. Edit the sheet in DA + publish → the tool updates on reload.
+ * Style Picker — pick a block, then compose a named style from that block's
+ * form definition. Fully sheet-driven, same-origin (published), no auth:
+ *   • /docs/library/blocks.json  → "data" tab lists the blocks (the top dropdown)
+ *   • /docs/library/styles/<block>.json → per-block workbook with two tabs:
+ *       - "options" : the FORM DEFINITION. One row per field:
+ *           { Name, Type, Options }
+ *           Type ∈ inputfield | colorpicker | dropdown | chips  (Options = "a | b | c")
+ *       - "data"    : the saved styles (one row per composed class)
+ * Edit either sheet in DA + publish and the tool updates on reload.
  */
 
-const BLOCKS_SHEET = `${window.location.origin}/docs/library/blocks.json`;
+const ORIGIN = window.location.origin;
+const BLOCKS_SHEET = `${ORIGIN}/docs/library/blocks.json`;
+const styleSheetUrl = (block) => `${ORIGIN}/docs/library/styles/${block}.json`;
 
-/** Pull a named sheet's rows out of a single- or multi-sheet payload. */
+/** Rows of a named tab from a single- or multi-sheet payload. */
 function sheetRows(payload, name) {
   if (!payload || typeof payload !== 'object') return [];
-  // multi-sheet: { data: {data:[…]}, options: {data:[…]} }
   if (payload[name] && Array.isArray(payload[name].data)) return payload[name].data;
-  // single-sheet: { data: [...] }
-  if (name === 'data' && Array.isArray(payload.data)) {
-    return payload.data;
-  }
+  if (name === 'data' && Array.isArray(payload.data)) return payload.data;
   return [];
 }
 
-/** @returns {Promise<{blocks: object[], options: object[]}>} */
-async function loadLibrary() {
-  const resp = await fetch(BLOCKS_SHEET);
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  const payload = await resp.json();
-  return {
-    blocks: sheetRows(payload, 'data'),
-    options: sheetRows(payload, 'options'),
-  };
-}
-
-/** class-ify a block name for matching the options' `blocks` column (Card → card). */
+/** slugify a block/style name (Card → card, "Promo Hero" → promo-hero). */
 function toKey(name) {
   return String(name || '').toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '');
 }
 
-function buildSelect(blocks) {
+/** Split an "a | b | c" options string into trimmed tokens. */
+function splitOptions(raw) {
+  return String(raw || '').split('|').map((t) => t.trim()).filter(Boolean);
+}
+
+async function loadBlocks() {
+  const resp = await fetch(BLOCKS_SHEET);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return sheetRows(await resp.json(), 'data');
+}
+
+/** Load one block's form definition + saved styles. */
+async function loadBlockSheet(block) {
+  const resp = await fetch(styleSheetUrl(block));
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const payload = await resp.json();
+  return { fields: sheetRows(payload, 'options'), saved: sheetRows(payload, 'data') };
+}
+
+function buildBlockSelect(blocks) {
   const select = document.createElement('select');
   select.className = 'style-picker-select';
   select.id = 'style-picker-select';
-
   const placeholder = document.createElement('option');
   placeholder.value = '';
   placeholder.textContent = blocks.length ? 'Choose a block…' : 'No blocks found';
   placeholder.disabled = true;
   placeholder.selected = true;
   select.append(placeholder);
-
-  blocks.forEach((block) => {
-    const option = document.createElement('option');
-    option.value = toKey(block.name);
-    option.textContent = block.name;
-    select.append(option);
+  blocks.forEach((b) => {
+    const o = document.createElement('option');
+    o.value = toKey(b.name);
+    o.textContent = b.name;
+    select.append(o);
   });
   return select;
 }
 
-/** Does an option row target this block? Includes ALL-scoped options. */
-function optionTargets(option, key) {
-  const scope = String(option.blocks || '').trim();
-  if (/^all$/i.test(scope)) return true;
-  return scope.split(/[\s,|]+/).map(toKey).includes(key);
-}
+/** Render one form field per its Type. Returns { row, getValue }. */
+function renderField(field, onChange, colorPicker) {
+  const name = field.Name || field.name || '';
+  const type = String(field.Type || field.type || '').toLowerCase();
 
-/**
- * Parse a `|`-separated values string into {label, value} tokens.
- * Supports plain tokens ("center") and label=value ("adobe-red=#FF0000").
- */
-function parseValues(raw) {
-  return String(raw || '')
-    .split('|')
-    .map((tok) => tok.trim())
-    .filter(Boolean)
-    .map((tok) => {
-      const eq = tok.indexOf('=');
-      if (eq === -1) return { label: tok, value: tok };
-      return { label: tok.slice(0, eq).trim(), value: tok.slice(eq + 1).trim() };
+  const row = document.createElement('div');
+  row.className = 'style-picker-field';
+  const label = document.createElement('label');
+  label.className = 'style-picker-field-label';
+  label.textContent = name;
+  row.append(label);
+
+  let getValue = () => '';
+
+  if (type === 'colorpicker') {
+    const swatch = document.createElement('button');
+    swatch.type = 'button';
+    swatch.className = 'style-picker-color';
+    let value = '';
+    const paint = () => {
+      swatch.style.background = value || 'transparent';
+      swatch.textContent = value ? '' : 'pick…';
+    };
+    swatch.addEventListener('click', () => {
+      colorPicker.open({
+        anchor: swatch,
+        value: value || '#000000',
+        label: name,
+        onChange: (hex) => {
+          value = hex;
+          paint();
+          onChange();
+        },
+      });
     });
+    paint();
+    row.append(swatch);
+    getValue = () => value;
+  } else if (type === 'dropdown') {
+    const sel = document.createElement('select');
+    sel.className = 'style-picker-option-select';
+    const none = document.createElement('option');
+    none.value = ''; none.textContent = '—';
+    sel.append(none);
+    splitOptions(field.Options || field.options).forEach((opt) => {
+      const o = document.createElement('option');
+      o.value = opt; o.textContent = opt;
+      sel.append(o);
+    });
+    sel.addEventListener('change', onChange);
+    row.append(sel);
+    getValue = () => sel.value;
+  } else if (type === 'chips') {
+    row.classList.add('style-picker-field-chips');
+    const chipRow = document.createElement('div');
+    chipRow.className = 'style-picker-chips';
+    let value = '';
+    splitOptions(field.Options || field.options).forEach((opt) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'style-picker-chip';
+      if (/^#[0-9a-f]{3,8}$/i.test(opt) || /^(rgb|hsl|linear-gradient)/i.test(opt)) {
+        const sw = document.createElement('span');
+        sw.className = 'style-picker-swatch';
+        sw.style.background = opt;
+        chip.append(sw);
+      }
+      chip.append(document.createTextNode(opt));
+      chip.addEventListener('click', () => {
+        const active = chip.classList.contains('is-active');
+        chipRow.querySelectorAll('.style-picker-chip.is-active')
+          .forEach((c) => c.classList.remove('is-active'));
+        if (active) {
+          value = '';
+        } else {
+          chip.classList.add('is-active');
+          value = opt;
+        }
+        onChange();
+      });
+      chipRow.append(chip);
+    });
+    row.append(chipRow);
+    getValue = () => value;
+  } else {
+    // inputfield (default)
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'style-picker-name-input';
+    input.placeholder = /name/i.test(name) ? 'e.g. promo-hero' : '';
+    input.addEventListener('input', onChange);
+    row.append(input);
+    getValue = () => input.value;
+  }
+
+  return { row, name, getValue };
 }
 
-/** A value that looks like a color/gradient we can swatch. */
-function isColorish(value) {
-  return /^#[0-9a-f]{3,8}$/i.test(value) || /^(rgb|hsl|linear-gradient|radial-gradient)/i.test(value);
-}
-
-/**
- * Redesigned composer — chips/swatches per option (not dropdowns). Author
- * clicks to toggle values (single-select per option), names the style, and sees
- * a live preview of the class + recipe they're building. Emits
- * style-compose-change with the chosen recipe.
- * @param {Element} container
- * @param {string} blockName  human name, e.g. "Section Metadata"
- * @param {string} blockKey   slug, e.g. "section-metadata"
- * @param {Array<Record<string,string>>} options
- */
-function renderComposer(container, blockName, blockKey, options) {
+/** Build the composer form from a block's field definitions. */
+function renderComposer(container, blockName, blockKey, sheet, colorPicker) {
   container.textContent = '';
-  const matches = options.filter((o) => optionTargets(o, blockKey));
+  const { fields } = sheet;
 
   const heading = document.createElement('h2');
   heading.className = 'style-picker-results-title';
   heading.textContent = `Compose a ${blockName} style`;
   container.append(heading);
 
-  if (!matches.length) {
+  if (!fields.length) {
     const empty = document.createElement('p');
     empty.className = 'style-picker-empty';
-    empty.textContent = `No style options defined for "${blockName}" yet. Add a row to the "options" sheet in DA.`;
+    empty.textContent = `No form defined for "${blockName}". Add rows to the "options" tab of its sheet in DA.`;
     container.append(empty);
     return;
   }
 
-  const chosen = {}; // key -> { label, value }
-
-  const nameLabel = document.createElement('span');
-  nameLabel.className = 'style-picker-field-label';
-  nameLabel.textContent = 'Style name';
-  const nameInput = document.createElement('input');
-  nameInput.type = 'text';
-  nameInput.className = 'style-picker-name-input';
-  nameInput.placeholder = 'e.g. promo-hero';
-  const nameField = document.createElement('div');
-  nameField.className = 'style-picker-field';
-  nameField.append(nameLabel, nameInput);
-
   const preview = document.createElement('div');
   preview.className = 'style-picker-preview';
+  const controls = document.createElement('div');
+  controls.className = 'style-picker-controls';
+  const fieldApis = [];
 
-  function slugName() {
-    return toKey(nameInput.value) || 'unnamed';
+  function collect() {
+    const values = {};
+    fieldApis.forEach(({ name, getValue }) => {
+      const v = getValue();
+      if (v) values[name] = v;
+    });
+    return values;
   }
 
-  function updatePreview() {
-    const parts = Object.entries(chosen).filter(([, v]) => v);
-    const className = `${blockKey}-${slugName()}`;
+  function nameField() {
+    const found = fieldApis.find(({ name }) => /name/i.test(name));
+    return found ? found.getValue() : '';
+  }
+
+  function update() {
+    const values = collect();
+    const className = `${blockKey}-${toKey(nameField()) || 'unnamed'}`;
     preview.innerHTML = '';
+    const code = document.createElement('code');
+    code.className = 'style-picker-preview-class';
+    code.textContent = `.${className}`;
+    preview.append(code);
 
-    const classLine = document.createElement('code');
-    classLine.className = 'style-picker-preview-class';
-    classLine.textContent = `.${className}`;
-    preview.append(classLine);
-
-    if (parts.length) {
+    const pills = Object.entries(values).filter(([n]) => !/name/i.test(n));
+    if (pills.length) {
       const recipe = document.createElement('div');
       recipe.className = 'style-picker-recipe';
-      parts.forEach(([k, v]) => {
+      pills.forEach(([n, v]) => {
         const pill = document.createElement('span');
         pill.className = 'style-picker-recipe-pill';
-        if (isColorish(v.value)) {
+        if (/^#[0-9a-f]{3,8}$/i.test(v) || /^(rgb|hsl|linear-gradient)/i.test(v)) {
           const sw = document.createElement('span');
           sw.className = 'style-picker-swatch';
-          sw.style.background = v.value;
+          sw.style.background = v;
           pill.append(sw);
         }
-        pill.append(document.createTextNode(`${k}: ${v.label}`));
+        pill.append(document.createTextNode(`${n}: ${v}`));
         recipe.append(pill);
       });
       preview.append(recipe);
-    } else {
-      const hint = document.createElement('span');
-      hint.className = 'style-picker-preview-hint';
-      hint.textContent = 'Pick options below to build the style.';
-      preview.append(hint);
     }
 
     container.dispatchEvent(new CustomEvent('style-compose-change', {
       bubbles: true,
-      detail: {
-        block: blockKey,
-        name: slugName(),
-        className,
-        recipe: Object.fromEntries(parts.map(([k, v]) => [k, v.value])),
-      },
+      detail: { block: blockKey, name: toKey(nameField()), className, values },
     }));
   }
 
-  const controls = document.createElement('div');
-  controls.className = 'style-picker-controls';
-
-  matches.forEach((opt) => {
-    const field = document.createElement('div');
-    field.className = 'style-picker-field style-picker-field-chips';
-
-    const fieldLabel = document.createElement('span');
-    fieldLabel.className = 'style-picker-field-label';
-    fieldLabel.textContent = opt.key;
-
-    const chipRow = document.createElement('div');
-    chipRow.className = 'style-picker-chips';
-
-    const tokens = parseValues(opt.values);
-    tokens.forEach((tok) => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'style-picker-chip';
-      chip.dataset.value = tok.value;
-
-      if (isColorish(tok.value)) {
-        const sw = document.createElement('span');
-        sw.className = 'style-picker-swatch';
-        sw.style.background = tok.value;
-        chip.append(sw);
-      }
-      chip.append(document.createTextNode(tok.label));
-
-      chip.addEventListener('click', () => {
-        const isActive = chip.classList.contains('is-active');
-        // single-select per option: clear siblings
-        chipRow.querySelectorAll('.style-picker-chip.is-active')
-          .forEach((c) => c.classList.remove('is-active'));
-        if (isActive) {
-          chosen[opt.key] = null; // toggle off
-        } else {
-          chip.classList.add('is-active');
-          chosen[opt.key] = tok;
-        }
-        updatePreview();
-      });
-
-      chipRow.append(chip);
-    });
-
-    field.append(fieldLabel, chipRow);
-    controls.append(field);
+  fields.forEach((field) => {
+    const api = renderField(field, update, colorPicker);
+    fieldApis.push(api);
+    controls.append(api.row);
   });
 
   const previewWrap = document.createElement('div');
@@ -235,10 +248,8 @@ function renderComposer(container, blockName, blockKey, options) {
   previewLabel.textContent = 'Your style';
   previewWrap.append(previewLabel, preview);
 
-  nameInput.addEventListener('input', updatePreview);
-
-  container.append(nameField, controls, previewWrap);
-  updatePreview();
+  container.append(controls, previewWrap);
+  update();
 }
 
 /** @param {Element} host */
@@ -260,9 +271,13 @@ export default async function decorate(host) {
 
   host.append(label, status);
 
-  let library;
+  // Reuse David's colour picker (already in the repo).
+  const { ColorPicker } = await import('../design-tokens/color-picker.js');
+  const colorPicker = new ColorPicker();
+
+  let blocks;
   try {
-    library = await loadLibrary();
+    blocks = await loadBlocks();
   } catch (err) {
     status.classList.add('is-error');
     status.textContent = `Could not load blocks (${err.message}). Is /docs/library/blocks published?`;
@@ -275,17 +290,21 @@ export default async function decorate(host) {
     return;
   }
 
-  const select = buildSelect(library.blocks);
+  const select = buildBlockSelect(blocks);
   status.remove();
   host.append(select, results);
 
-  select.addEventListener('change', () => {
+  select.addEventListener('change', async () => {
     const blockName = select.selectedOptions[0]?.textContent || '';
-    host.dispatchEvent(new CustomEvent('style-picker-change', {
-      bubbles: true,
-      detail: { block: select.value, name: blockName },
-    }));
-    if (select.value) renderComposer(results, blockName, select.value, library.options);
+    const blockKey = select.value;
+    if (!blockKey) return;
+    results.innerHTML = '<p class="style-picker-status">Loading form…</p>';
+    try {
+      const sheet = await loadBlockSheet(blockKey);
+      renderComposer(results, blockName, blockKey, sheet, colorPicker);
+    } catch (err) {
+      results.innerHTML = `<p class="style-picker-status is-error">No sheet for "${blockName}" (${err.message}). Create /docs/library/styles/${blockKey}.</p>`;
+    }
   });
 }
 
