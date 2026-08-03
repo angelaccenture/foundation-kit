@@ -117,3 +117,62 @@
   border-radius: 3px;
   vertical-align: -0.15rem;
 }
+
+/* Composer — controls + live summary */
+.style-picker-controls {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.style-picker-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.style-picker-field-label {
+  min-width: 7rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.style-picker-option-select {
+  flex: 1;
+  max-width: 22rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.style-picker-swatch-lg {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 5px;
+}
+
+.style-picker-summary-wrap {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.style-picker-summary-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin-bottom: 0.35rem;
+}
+
+.style-picker-summary {
+  font-size: 0.95rem;
+  color: #18181b;
+}

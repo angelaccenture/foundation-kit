@@ -59,16 +59,48 @@ function buildSelect(blocks) {
   return select;
 }
 
-/** Show the style options for the chosen block (rows in "options" that target it). */
-function renderOptions(container, blockName, options) {
+/** Does an option row target this block? Includes ALL-scoped options. */
+function optionTargets(option, key) {
+  const scope = String(option.blocks || '').trim();
+  if (/^all$/i.test(scope)) return true;
+  return scope.split(/[\s,|]+/).map(toKey).includes(key);
+}
+
+/**
+ * Parse a `|`-separated values string into {label, value} tokens.
+ * Supports plain tokens ("center") and label=value ("adobe-red=#FF0000").
+ */
+function parseValues(raw) {
+  return String(raw || '')
+    .split('|')
+    .map((tok) => tok.trim())
+    .filter(Boolean)
+    .map((tok) => {
+      const eq = tok.indexOf('=');
+      if (eq === -1) return { label: tok, value: tok };
+      return { label: tok.slice(0, eq).trim(), value: tok.slice(eq + 1).trim() };
+    });
+}
+
+/** A value that looks like a color/gradient we can swatch. */
+function isColorish(value) {
+  return /^#[0-9a-f]{3,8}$/i.test(value) || /^(rgb|hsl|linear-gradient|radial-gradient)/i.test(value);
+}
+
+/**
+ * Render each style option as a labeled control; picks compose a live summary.
+ * @param {Element} container
+ * @param {string} blockName
+ * @param {Array<Record<string,string>>} options
+ */
+function renderComposer(container, blockName, options) {
   container.textContent = '';
   const key = toKey(blockName);
-  const matches = options.filter((o) => toKey(o.blocks) === key
-    || String(o.blocks || '').split(/[\s,|]+/).map(toKey).includes(key));
+  const matches = options.filter((o) => optionTargets(o, key));
 
   const heading = document.createElement('h2');
   heading.className = 'style-picker-results-title';
-  heading.textContent = `${blockName} style options`;
+  heading.textContent = `Compose a ${blockName} style`;
   container.append(heading);
 
   if (!matches.length) {
@@ -79,21 +111,78 @@ function renderOptions(container, blockName, options) {
     return;
   }
 
-  const table = document.createElement('table');
-  table.className = 'style-picker-table';
-  table.innerHTML = '<thead><tr><th>Option</th><th>Values</th></tr></thead>';
-  const tbody = document.createElement('tbody');
-  matches.forEach((o) => {
-    const tr = document.createElement('tr');
-    const k = document.createElement('td');
-    k.textContent = o.key || '—';
-    const v = document.createElement('td');
-    v.textContent = o.values || '—';
-    tr.append(k, v);
-    tbody.append(tr);
+  const chosen = {};
+  const summary = document.createElement('output');
+  summary.className = 'style-picker-summary';
+
+  function updateSummary() {
+    const parts = Object.entries(chosen).filter(([, v]) => v);
+    summary.textContent = parts.length
+      ? parts.map(([k, v]) => `${k}: ${v.label}`).join('   •   ')
+      : 'No options chosen yet.';
+    container.dispatchEvent(new CustomEvent('style-compose-change', {
+      bubbles: true,
+      detail: { block: key, values: Object.fromEntries(parts.map(([k, v]) => [k, v.value])) },
+    }));
+  }
+
+  const controls = document.createElement('div');
+  controls.className = 'style-picker-controls';
+
+  matches.forEach((opt) => {
+    const field = document.createElement('div');
+    field.className = 'style-picker-field';
+
+    const fieldLabel = document.createElement('label');
+    fieldLabel.className = 'style-picker-field-label';
+    fieldLabel.textContent = opt.key;
+
+    const sel = document.createElement('select');
+    sel.className = 'style-picker-option-select';
+
+    const none = document.createElement('option');
+    none.value = '';
+    none.textContent = '—';
+    sel.append(none);
+
+    const tokens = parseValues(opt.values);
+    tokens.forEach((tok, i) => {
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = tok.label;
+      sel.append(o);
+    });
+
+    // Swatch preview for colorish selections.
+    const swatch = document.createElement('span');
+    swatch.className = 'style-picker-swatch style-picker-swatch-lg';
+    swatch.hidden = true;
+
+    sel.addEventListener('change', () => {
+      const tok = tokens[Number(sel.value)];
+      chosen[opt.key] = tok || null;
+      if (tok && isColorish(tok.value)) {
+        swatch.hidden = false;
+        swatch.style.background = tok.value;
+      } else {
+        swatch.hidden = true;
+      }
+      updateSummary();
+    });
+
+    field.append(fieldLabel, sel, swatch);
+    controls.append(field);
   });
-  table.append(tbody);
-  container.append(table);
+
+  const summaryWrap = document.createElement('div');
+  summaryWrap.className = 'style-picker-summary-wrap';
+  const summaryLabel = document.createElement('span');
+  summaryLabel.className = 'style-picker-summary-label';
+  summaryLabel.textContent = 'Composed style';
+  summaryWrap.append(summaryLabel, summary);
+
+  container.append(controls, summaryWrap);
+  updateSummary();
 }
 
 /** @param {Element} host */
@@ -140,7 +229,7 @@ export default async function decorate(host) {
       bubbles: true,
       detail: { block: select.value, name: blockName },
     }));
-    if (select.value) renderOptions(results, blockName, library.options);
+    if (select.value) renderComposer(results, blockName, library.options);
   });
 }
 
