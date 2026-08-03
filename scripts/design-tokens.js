@@ -22,27 +22,12 @@ function sanitizeHexColor(value) {
   return null;
 }
 
-/** Readable text color for a background — matches the tool's helper. */
-function getContrastColor(hex) {
-  const color = sanitizeHexColor(hex);
-  if (!color) return '#18181b';
-  const r = parseInt(color.slice(1, 3), 16) / 255;
-  const g = parseInt(color.slice(3, 5), 16) / 255;
-  const b = parseInt(color.slice(5, 7), 16) / 255;
-  const lin = (c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-  const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-  return luminance > 0.5 ? '#18181b' : '#ffffff';
-}
-
 /** @param {string} name */
 function toClassName(name) {
   return typeof name === 'string'
     ? name.toLowerCase().replace(/[^0-9a-z]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
     : '';
 }
-
-const FONT_SIZES = { small: '0.9rem', medium: '1.05rem', large: '1.35rem' };
-const ALIGN = { left: 'left', center: 'center', right: 'right' };
 
 /** Find a row value by fuzzy column-name match (background/foreground/accent…). */
 function pick(row, ...needles) {
@@ -53,41 +38,50 @@ function pick(row, ...needles) {
   return key ? row[key] : '';
 }
 
-/** Build the CSS rules for one style row, scoped to `.section.<slug>`. */
-function ruleFor(row) {
-  const name = pick(row, 'style', 'name') || Object.values(row)[0] || '';
-  const slug = toClassName(name);
-  if (!slug) return '';
-
-  const sel = `.section.${slug}`;
-  const bg = sanitizeHexColor(pick(row, 'background'));
-  const fg = sanitizeHexColor(pick(row, 'foreground'));
-  const accent = sanitizeHexColor(pick(row, 'accent'));
-  const fontSize = FONT_SIZES[String(pick(row, 'font', 'size')).trim().toLowerCase()];
-  const align = ALIGN[String(pick(row, 'horizontal', 'align')).trim().toLowerCase()];
-  const split = /^(\d+)\s*-\s*(\d+)$/.exec(String(pick(row, 'layout', 'split')).trim());
-
-  const rules = [];
-  const sectionDecls = [];
-  if (bg) sectionDecls.push(`background-color:${bg}`);
-  if (fg) sectionDecls.push(`color:${fg}`);
-  if (fontSize) sectionDecls.push(`font-size:${fontSize}`);
-  if (align) sectionDecls.push(`text-align:${align}`);
-  if (sectionDecls.length) rules.push(`${sel}{${sectionDecls.join(';')}}`);
-
-  if (accent) {
-    rules.push(`${sel} h1,${sel} h2,${sel} h3{color:${accent}}`);
-    rules.push(`${sel} .btn,${sel} .button,${sel} a.button{background-color:${accent};color:${getContrastColor(accent)};border-color:${accent}}`);
-  }
-  // Layout split applies when the section is a grid (columns/media two-up).
-  if (split) {
-    rules.push(`${sel}.grid .block-content,${sel} .columns > div,${sel} .media{grid-template-columns:${split[1]}fr ${split[2]}fr}`);
-  }
-  return rules.join('');
+/** Map a sheet column name to David's CSS-variable name. */
+function columnToVar(column) {
+  const slug = toClassName(column);
+  if (slug === 'background' || slug === 'foreground') return `--${slug}-color`;
+  if (slug.includes('accent')) return '--accent-color';
+  return null; // non-colour columns become data-* attributes, not vars
 }
 
 /**
- * Fetch the style sheet and inject the generated CSS.
+ * Build the CSS variable rule for one style row, scoped to the style class on
+ * either a section or a block: `.section.<slug>, .<slug>`. Mirrors David's
+ * consumer — colours become CSS custom properties the block reads via var().
+ * @returns {{ slug: string, rule: string, dataAttrs: Record<string,string> }|null}
+ */
+function ruleFor(row) {
+  const name = pick(row, 'style', 'name') || Object.values(row)[0] || '';
+  const slug = toClassName(name);
+  if (!slug) return null;
+
+  const vars = [];
+  const dataAttrs = {};
+  Object.keys(row).forEach((column) => {
+    if (/name/i.test(column) || column.startsWith(':')) return;
+    const value = String(row[column] || '').trim();
+    if (!value) return;
+    const cssVar = columnToVar(column);
+    if (cssVar) {
+      const hex = sanitizeHexColor(value);
+      vars.push(`${cssVar}:${hex || value}`);
+    } else {
+      // e.g. Layout Split -> data-layout-split, Font Sizes -> data-font-sizes
+      dataAttrs[`data-${toClassName(column)}`] = value.toLowerCase();
+    }
+  });
+
+  const sel = `.section.${slug},.${slug}`;
+  const rule = vars.length ? `${sel}{${vars.join(';')}}` : '';
+  return { slug, rule, dataAttrs };
+}
+
+/**
+ * Fetch the style sheet, inject the CSS-variable rules, and mirror non-colour
+ * values to data-* attributes on every element carrying the style class (so a
+ * block like banner can theme itself from var() + [data-*]).
  * @param {Document} doc
  */
 export default async function applyDesignTokens(doc = document) {
@@ -100,13 +94,24 @@ export default async function applyDesignTokens(doc = document) {
     if (!resp.ok) return;
     const payload = await resp.json();
     const rows = Array.isArray(payload) ? payload : payload.data || [];
-    const css = rows.map(ruleFor).filter(Boolean).join('\n');
-    if (!css) return;
+    const parsed = rows.map(ruleFor).filter(Boolean);
+    if (!parsed.length) return;
 
-    const style = doc.createElement('style');
-    style.dataset.designTokens = '';
-    style.textContent = css;
-    doc.head.append(style);
+    const css = parsed.map((p) => p.rule).filter(Boolean).join('\n');
+    if (css) {
+      const style = doc.createElement('style');
+      style.dataset.designTokens = '';
+      style.textContent = css;
+      doc.head.append(style);
+    }
+
+    // Mirror data-* attributes onto every element using each style class.
+    parsed.forEach(({ slug, dataAttrs }) => {
+      if (!Object.keys(dataAttrs).length) return;
+      doc.querySelectorAll(`.section.${slug},.${slug}`).forEach((el) => {
+        Object.entries(dataAttrs).forEach(([attr, val]) => el.setAttribute(attr, val));
+      });
+    });
   } catch (e) {
     // Sheet missing or malformed — no tokens applied, page renders normally.
   }

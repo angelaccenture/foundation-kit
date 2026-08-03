@@ -1,0 +1,494 @@
+/* Banner block - ported from David Nuescheler's design-tokens reference;
+   commerce design-token vars remapped to foundation-kit tokens. The color
+   connection (--background-color/--foreground-color/--accent-color) is his. */
+
+/* -----------------------------------------------------------------------------
+ * Banner variants — theme via externally set CSS variables on the block/section:
+ *   --background-color, --foreground-color, --accent-color
+ * -------------------------------------------------------------------------- */
+
+ .section > .banner-wrapper {
+  margin: var(--spacing-m) auto;
+}
+
+/* Shared content typography */
+:is(.banner-image, .banner-background) .banner-content :is(h1, h2, h3, h4, h5, h6, p) {
+  margin: 0;
+}
+
+:is(.banner-image, .banner-background) .banner-content h3 {
+  font-size: var(--heading-font-size-xs);
+  line-height: var(--heading-line-height);
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--foreground-color, var(--color-text, #2a2e33));
+}
+
+:is(.banner-image, .banner-background) .banner-content h2 {
+  font-size: var(--heading-font-size-xl);
+  line-height: var(--heading-line-height);
+  font-weight: var(--font-weight-bold, 700);
+  text-transform: uppercase;
+  color: var(--accent-color, var(--color-text, #2a2e33));
+}
+
+:is(.banner-image, .banner-background) .banner-content h5 {
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+  font-weight: var(--font-weight-regular, 400);
+  color: var(--foreground-color, var(--color-text, #2a2e33));
+}
+
+:is(.banner-image, .banner-background) .banner-content .button-container {
+  margin: 0;
+}
+
+:is(.banner-image, .banner-background) .banner-content .button-container + .button-container {
+  margin-top: calc(var(--spacing-xs) - var(--spacing-s));
+}
+
+:is(.banner-image, .banner-background) .banner-content a.button {
+  background-color: var(--accent-color, var(--color-text, #2a2e33));
+  color: var(--color-light, #fff);
+  margin: var(--spacing-xs) 0 0;
+  min-width: 11.25rem;
+}
+
+:is(.banner-image, .banner-background) .banner-content .button-container + .button-container a.button {
+  margin-top: 0;
+}
+
+:is(.banner-image, .banner-background) .banner-content a.button:hover,
+:is(.banner-image, .banner-background) .banner-content a.button:focus {
+  filter: brightness(0.92);
+}
+
+:is(.banner-image, .banner-background) .banner-content a.button.secondary {
+  background-color: transparent;
+  border-color: var(--accent-color, var(--color-text, #2a2e33));
+  color: var(--accent-color, var(--color-text, #2a2e33));
+}
+
+:is(.banner-image, .banner-background) .banner-content a.button.secondary:hover,
+:is(.banner-image, .banner-background) .banner-content a.button.secondary:focus {
+  filter: none;
+  background-color: var(--accent-color, var(--color-text, #2a2e33));
+  color: var(--color-light, #fff);
+}
+
+/* -----------------------------------------------------------------------------
+ * Banner (image) — two-column promo banner
+ * -------------------------------------------------------------------------- */
+
+.banner-image > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-image .banner-media {
+  line-height: 0;
+  overflow: hidden;
+}
+
+.banner-image .banner-media picture,
+.banner-image .banner-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-image .banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-s);
+  padding: var(--spacing-xl) var(--spacing-m);
+  text-align: center;
+  background-color: var(--background-color, var(--color-shaded, #f5f5f2));
+  color: var(--foreground-color, var(--color-text, #2a2e33));
+}
+
+@media (width >= 900px) {
+  .banner-image > div {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 18.75rem;
+  }
+
+  .banner-image .banner-media {
+    flex: 1.4;
+  }
+
+  .banner-image .banner-content {
+    flex: 1;
+    padding: var(--spacing-xl);
+  }
+
+  .banner-image .banner-content h2 {
+    font-size: var(--heading-font-size-xl);
+    line-height: var(--heading-line-height);
+  }
+}
+
+@media (width >= 1440px) {
+  .banner-image > div {
+    min-height: 24.625rem;
+  }
+
+  .banner-image .banner-content h2 {
+    font-size: var(--heading-font-size-xxl);
+    line-height: var(--heading-line-height);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+ * Banner (background) — full-width image behind overlaid content
+ * -------------------------------------------------------------------------- */
+
+.banner-wrapper:has(.banner-background) {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+.banner-background {
+  position: relative;
+  overflow: hidden;
+  min-height: 18.75rem;
+}
+
+.banner-background > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: inherit;
+}
+
+.banner-background .banner-media {
+  grid-area: 1 / 1;
+  line-height: 0;
+}
+
+.banner-background .banner-media picture,
+.banner-background .banner-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  object-fit: cover;
+}
+
+.banner-background .banner-content {
+  grid-area: 1 / 1;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  align-content: center;
+  gap: var(--spacing-s);
+  width: 100%;
+  max-width: var(--content-max-width, 1200px);
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-l);
+  box-sizing: border-box;
+  min-height: inherit;
+  text-align: left;
+  color: var(--foreground-color, var(--color-text, #2a2e33));
+  background-color: transparent;
+}
+
+.banner-background > div:has(> .banner-content:first-child) .banner-content > * {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.banner-background > div:has(> .banner-media:first-child) .banner-content {
+  grid-template-columns: 1.4fr 1fr;
+  text-align: right;
+}
+
+.banner-background > div:has(> .banner-media:first-child) .banner-content > * {
+  grid-column: 2;
+  justify-self: end;
+}
+
+@media (width >= 900px) {
+  .banner-background {
+    min-height: 24.625rem;
+  }
+
+  .banner-background .banner-content h2 {
+    font-size: var(--heading-font-size-xl);
+    line-height: var(--heading-line-height);
+  }
+}
+
+@media (width < 900px) {
+  .banner-background .banner-content,
+  .banner-background > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 1fr;
+  }
+
+  .banner-background .banner-content > *,
+  .banner-background > div:has(> .banner-media:first-child) .banner-content > * {
+    grid-column: 1;
+    justify-self: start;
+    text-align: left;
+  }
+}
+
+@media (width >= 1440px) {
+  .banner-background .banner-content h2 {
+    font-size: var(--heading-font-size-xxl);
+    line-height: var(--heading-line-height);
+  }
+}
+
+.banner .banner-content a:not(.button):any-link {
+  color: var(--accent-color);
+}
+
+/* -----------------------------------------------------------------------------
+ * Design-token data attributes (from colors.json style tokens)
+ * e.g. data-layout-split="60-40" on the section and/or banner block.
+ * -------------------------------------------------------------------------- */
+
+/* Layout split — content : media (desktop) */
+@media (width >= 900px) {
+  :is([data-layout-split='30-70'] .banner-image, .banner-image[data-layout-split='30-70']) > div > .banner-content {
+    flex: 30;
+  }
+
+  :is([data-layout-split='30-70'] .banner-image, .banner-image[data-layout-split='30-70']) > div > .banner-media {
+    flex: 70;
+  }
+
+  :is([data-layout-split='40-60'] .banner-image, .banner-image[data-layout-split='40-60']) > div > .banner-content {
+    flex: 40;
+  }
+
+  :is([data-layout-split='40-60'] .banner-image, .banner-image[data-layout-split='40-60']) > div > .banner-media {
+    flex: 60;
+  }
+
+  :is([data-layout-split='50-50'] .banner-image, .banner-image[data-layout-split='50-50']) > div > .banner-content,
+  :is([data-layout-split='50-50'] .banner-image, .banner-image[data-layout-split='50-50']) > div > .banner-media {
+    flex: 1;
+  }
+
+  :is([data-layout-split='60-40'] .banner-image, .banner-image[data-layout-split='60-40']) > div > .banner-content {
+    flex: 60;
+  }
+
+  :is([data-layout-split='60-40'] .banner-image, .banner-image[data-layout-split='60-40']) > div > .banner-media {
+    flex: 40;
+  }
+
+  :is([data-layout-split='70-30'] .banner-image, .banner-image[data-layout-split='70-30']) > div > .banner-content {
+    flex: 70;
+  }
+
+  :is([data-layout-split='70-30'] .banner-image, .banner-image[data-layout-split='70-30']) > div > .banner-media {
+    flex: 30;
+  }
+
+  :is([data-layout-split='30-70'] .banner-background, .banner-background[data-layout-split='30-70']) .banner-content {
+    grid-template-columns: 30fr 70fr;
+  }
+
+  :is([data-layout-split='30-70'] .banner-background, .banner-background[data-layout-split='30-70'])
+    > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 70fr 30fr;
+  }
+
+  :is([data-layout-split='40-60'] .banner-background, .banner-background[data-layout-split='40-60']) .banner-content {
+    grid-template-columns: 40fr 60fr;
+  }
+
+  :is([data-layout-split='40-60'] .banner-background, .banner-background[data-layout-split='40-60'])
+    > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 60fr 40fr;
+  }
+
+  :is([data-layout-split='50-50'] .banner-background, .banner-background[data-layout-split='50-50']) .banner-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  :is([data-layout-split='50-50'] .banner-background, .banner-background[data-layout-split='50-50'])
+    > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  :is([data-layout-split='60-40'] .banner-background, .banner-background[data-layout-split='60-40']) .banner-content {
+    grid-template-columns: 60fr 40fr;
+  }
+
+  :is([data-layout-split='60-40'] .banner-background, .banner-background[data-layout-split='60-40'])
+    > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 40fr 60fr;
+  }
+
+  :is([data-layout-split='70-30'] .banner-background, .banner-background[data-layout-split='70-30']) .banner-content {
+    grid-template-columns: 70fr 30fr;
+  }
+
+  :is([data-layout-split='70-30'] .banner-background, .banner-background[data-layout-split='70-30'])
+    > div:has(> .banner-media:first-child) .banner-content {
+    grid-template-columns: 30fr 70fr;
+  }
+}
+
+/* Horizontal alignment */
+:is([data-horizontal-alignment='left'] .banner-image, .banner-image[data-horizontal-alignment='left']) .banner-content {
+  align-items: flex-start;
+  text-align: left;
+}
+
+:is([data-horizontal-alignment='center'] .banner-image, .banner-image[data-horizontal-alignment='center']) .banner-content {
+  align-items: center;
+  text-align: center;
+}
+
+:is([data-horizontal-alignment='right'] .banner-image, .banner-image[data-horizontal-alignment='right']) .banner-content {
+  align-items: flex-end;
+  text-align: right;
+}
+
+:is([data-horizontal-alignment='left'] .banner-background, .banner-background[data-horizontal-alignment='left']) .banner-content,
+:is([data-horizontal-alignment='left'] .banner-background, .banner-background[data-horizontal-alignment='left'])
+  > div:has(> .banner-media:first-child) .banner-content {
+  text-align: left;
+}
+
+:is([data-horizontal-alignment='left'] .banner-background, .banner-background[data-horizontal-alignment='left']) .banner-content > *,
+:is([data-horizontal-alignment='left'] .banner-background, .banner-background[data-horizontal-alignment='left'])
+  > div:has(> .banner-media:first-child) .banner-content > * {
+  justify-self: start;
+}
+
+:is([data-horizontal-alignment='center'] .banner-background, .banner-background[data-horizontal-alignment='center']) .banner-content,
+:is([data-horizontal-alignment='center'] .banner-background, .banner-background[data-horizontal-alignment='center'])
+  > div:has(> .banner-media:first-child) .banner-content {
+  text-align: center;
+}
+
+:is([data-horizontal-alignment='center'] .banner-background, .banner-background[data-horizontal-alignment='center']) .banner-content > *,
+:is([data-horizontal-alignment='center'] .banner-background, .banner-background[data-horizontal-alignment='center'])
+  > div:has(> .banner-media:first-child) .banner-content > * {
+  justify-self: center;
+}
+
+:is([data-horizontal-alignment='right'] .banner-background, .banner-background[data-horizontal-alignment='right']) .banner-content,
+:is([data-horizontal-alignment='right'] .banner-background, .banner-background[data-horizontal-alignment='right'])
+  > div:has(> .banner-media:first-child) .banner-content {
+  text-align: right;
+}
+
+:is([data-horizontal-alignment='right'] .banner-background, .banner-background[data-horizontal-alignment='right']) .banner-content > *,
+:is([data-horizontal-alignment='right'] .banner-background, .banner-background[data-horizontal-alignment='right'])
+  > div:has(> .banner-media:first-child) .banner-content > * {
+  justify-self: end;
+}
+
+/* Vertical alignment */
+:is([data-vertical-alignment='center'] .banner-image, .banner-image[data-vertical-alignment='center']) .banner-content {
+  justify-content: center;
+}
+
+:is([data-vertical-alignment='center'] .banner-background, .banner-background[data-vertical-alignment='center']) .banner-content {
+  align-content: center;
+}
+
+/* Font sizes */
+:is([data-font-sizes='small'] .banner-image, .banner-image[data-font-sizes='small'],
+  [data-font-sizes='small'] .banner-background, .banner-background[data-font-sizes='small']) .banner-content h3 {
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+}
+
+:is([data-font-sizes='small'] .banner-image, .banner-image[data-font-sizes='small'],
+  [data-font-sizes='small'] .banner-background, .banner-background[data-font-sizes='small']) .banner-content h2 {
+  font-size: var(--heading-font-size-m);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='small'] .banner-image, .banner-image[data-font-sizes='small'],
+  [data-font-sizes='small'] .banner-background, .banner-background[data-font-sizes='small']) .banner-content h5 {
+  font-size: var(--body-font-size-s);
+  line-height: var(--body-line-height);
+}
+
+:is([data-font-sizes='medium'] .banner-image, .banner-image[data-font-sizes='medium'],
+  [data-font-sizes='medium'] .banner-background, .banner-background[data-font-sizes='medium']) .banner-content h3 {
+  font-size: var(--heading-font-size-xs);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='medium'] .banner-image, .banner-image[data-font-sizes='medium'],
+  [data-font-sizes='medium'] .banner-background, .banner-background[data-font-sizes='medium']) .banner-content h2 {
+  font-size: var(--heading-font-size-xl);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='medium'] .banner-image, .banner-image[data-font-sizes='medium'],
+  [data-font-sizes='medium'] .banner-background, .banner-background[data-font-sizes='medium']) .banner-content h5 {
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+}
+
+:is([data-font-sizes='large'] .banner-image, .banner-image[data-font-sizes='large'],
+  [data-font-sizes='large'] .banner-background, .banner-background[data-font-sizes='large']) .banner-content h3 {
+  font-size: var(--heading-font-size-s);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='large'] .banner-image, .banner-image[data-font-sizes='large'],
+  [data-font-sizes='large'] .banner-background, .banner-background[data-font-sizes='large']) .banner-content h2 {
+  font-size: var(--heading-font-size-xxl);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='large'] .banner-image, .banner-image[data-font-sizes='large'],
+  [data-font-sizes='large'] .banner-background, .banner-background[data-font-sizes='large']) .banner-content h5 {
+  font-size: var(--body-font-size-l);
+  line-height: var(--body-line-height);
+}
+
+@media (width >= 900px) {
+  :is([data-font-sizes='small'] .banner-image, .banner-image[data-font-sizes='small'],
+    [data-font-sizes='small'] .banner-background, .banner-background[data-font-sizes='small']) .banner-content h2 {
+    font-size: var(--heading-font-size-l);
+    line-height: var(--heading-line-height);
+  }
+
+  :is([data-font-sizes='medium'] .banner-image, .banner-image[data-font-sizes='medium'],
+    [data-font-sizes='medium'] .banner-background, .banner-background[data-font-sizes='medium']) .banner-content h2 {
+    font-size: var(--heading-font-size-xl);
+    line-height: var(--heading-line-height);
+  }
+
+  :is([data-font-sizes='large'] .banner-image, .banner-image[data-font-sizes='large'],
+    [data-font-sizes='large'] .banner-background, .banner-background[data-font-sizes='large']) .banner-content h2 {
+    font-size: var(--heading-font-size-xxl);
+    line-height: var(--heading-line-height);
+  }
+}
+
+@media (width >= 1440px) {
+  :is([data-font-sizes='small'] .banner-image, .banner-image[data-font-sizes='small'],
+    [data-font-sizes='small'] .banner-background, .banner-background[data-font-sizes='small']) .banner-content h2 {
+    font-size: var(--heading-font-size-xl);
+    line-height: var(--heading-line-height);
+  }
+
+  :is([data-font-sizes='medium'] .banner-image, .banner-image[data-font-sizes='medium'],
+    [data-font-sizes='medium'] .banner-background, .banner-background[data-font-sizes='medium']) .banner-content h2 {
+    font-size: var(--heading-font-size-xxl);
+    line-height: var(--heading-line-height);
+  }
+
+  :is([data-font-sizes='large'] .banner-image, .banner-image[data-font-sizes='large'],
+    [data-font-sizes='large'] .banner-background, .banner-background[data-font-sizes='large']) .banner-content h2 {
+    font-size: 2.75rem;
+    line-height: var(--heading-line-height);
+  }
+}
