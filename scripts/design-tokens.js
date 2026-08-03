@@ -102,7 +102,11 @@ export default async function applyDesignTokens(doc = document) {
     const resp = await fetch(url);
     if (!resp.ok) return;
     const payload = await resp.json();
-    const rows = Array.isArray(payload) ? payload : payload.data || [];
+    // Support single-sheet ({data:[...]}) and multi-sheet ({data:{data:[...]}}).
+    let rows = [];
+    if (Array.isArray(payload)) rows = payload;
+    else if (Array.isArray(payload.data)) rows = payload.data;
+    else if (payload.data && Array.isArray(payload.data.data)) rows = payload.data.data;
     const parsed = rows.map(ruleFor).filter(Boolean);
     if (!parsed.length) return;
 
