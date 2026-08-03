@@ -74,6 +74,12 @@ function toClassName(name) {
     : '';
 }
 
+// Sheet-provided option values (optional). Populated from an "options" tab in
+// the workbook if present: { key, values } where values = "a | b | c". When a
+// column has no sheet entry, we fall back to the hardcoded SELECT_OPTIONS below.
+// Additive: David's defaults still apply when no options tab exists.
+const sheetOptions = {};
+
 const SELECT_OPTIONS = {
   'layout-split': ['30-70', '40-60', '50-50', '60-40', '70-30'],
   'horizontal-alignment': ['left', 'center', 'right'],
@@ -87,11 +93,30 @@ const SELECT_OPTIONS = {
  */
 function getSelectOptions(column) {
   const slug = toClassName(column);
+  // Sheet-driven first (author-editable), then David's hardcoded fallback.
+  if (sheetOptions[slug]) return sheetOptions[slug];
   if (slug.includes('layout') && slug.includes('split')) return SELECT_OPTIONS['layout-split'];
   if (slug.includes('horizontal') && slug.includes('align')) return SELECT_OPTIONS['horizontal-alignment'];
   if (slug.includes('vertical') && slug.includes('align')) return SELECT_OPTIONS['vertical-alignment'];
   if (slug.includes('font') && slug.includes('size')) return SELECT_OPTIONS['font-sizes'];
   return null;
+}
+
+/**
+ * Populate sheetOptions from an optional "options" tab in the workbook.
+ * Rows: { key/Name, values/Options } where values is "a | b | c". No-op if the
+ * tab is absent (single-sheet workbooks keep David's hardcoded defaults).
+ * @param {object} payload the full workbook JSON
+ */
+function loadSheetOptions(payload) {
+  const tab = payload && payload.options && Array.isArray(payload.options.data)
+    ? payload.options.data : [];
+  tab.forEach((row) => {
+    const key = toClassName(row.key || row.Name || row.name || '');
+    const raw = row.values || row.Options || row.options || '';
+    const values = String(raw).split('|').map((v) => v.trim()).filter(Boolean);
+    if (key && values.length) sheetOptions[key] = values;
+  });
 }
 
 /**
@@ -210,6 +235,7 @@ class DesignTokensApp {
       const response = await fetch(this.path);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
+      loadSheetOptions(payload);
       const rows = normalizePayload(payload);
       this.sourceRows = rows;
       this.columns = extractColumns(rows);
