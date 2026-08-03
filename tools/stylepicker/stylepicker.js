@@ -164,6 +164,55 @@ function renderField(field, onChange, colorPicker) {
 }
 
 /** Build the composer form from a block's field definitions. */
+/**
+ * Build an EDS block table (as HTML) for pasting into a DA authored page.
+ * The composed style name becomes the block's variant in the header cell:
+ *   Card (promo-hero)  →  <div class="card promo-hero"> on the page.
+ * A caption row lists the applied style classes so the author sees them on-page.
+ * @param {string} blockName  human name (e.g. "Card")
+ * @param {string} blockKey   slug (e.g. "card")
+ * @param {string} styleName  composed style slug (e.g. "promo-hero")
+ * @returns {string} HTML table markup
+ */
+function buildBlockTable(blockName, blockKey, styleName) {
+  const variant = styleName && styleName !== 'unnamed' ? styleName : '';
+  const header = variant ? `${blockName} (${variant})` : blockName;
+  const classes = ['block', blockKey, variant].filter(Boolean).join(' ');
+  return [
+    '<table border="1">',
+    `  <tr><td>${header}</td></tr>`,
+    '  <tr><td>Replace with your content</td></tr>',
+    `  <tr><td>Style: ${classes}</td></tr>`,
+    '</table>',
+  ].join('\n');
+}
+
+/**
+ * Write both HTML and plain-text flavours to the clipboard (DA reads text/html
+ * for a rich paste, text/plain as a fallback). Mirrors adobe/da-live's
+ * navigator.clipboard.write(ClipboardItem) approach.
+ * @param {string} html
+ * @returns {Promise<boolean>}
+ */
+async function copyBlockToClipboard(html) {
+  try {
+    const item = new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([html], { type: 'text/plain' }),
+    });
+    await navigator.clipboard.write([item]);
+    return true;
+  } catch (e) {
+    // Fallback: plain-text write (older browsers / permissions).
+    try {
+      await navigator.clipboard.writeText(html);
+      return true;
+    } catch (e2) {
+      return false;
+    }
+  }
+}
+
 function renderComposer(container, blockName, blockKey, sheet, colorPicker) {
   container.textContent = '';
   const { fields } = sheet;
@@ -248,7 +297,34 @@ function renderComposer(container, blockName, blockKey, sheet, colorPicker) {
   previewLabel.textContent = 'Your style';
   previewWrap.append(previewLabel, preview);
 
-  container.append(controls, previewWrap);
+  // Copy-block — put a paste-able EDS block table on the clipboard.
+  const copyWrap = document.createElement('div');
+  copyWrap.className = 'style-picker-copy';
+  const copyBtn = document.createElement('button');
+  copyBtn.type = 'button';
+  copyBtn.className = 'style-picker-copy-btn';
+  copyBtn.textContent = 'Copy block';
+  const copyMsg = document.createElement('p');
+  copyMsg.className = 'style-picker-copy-msg';
+  const codePeek = document.createElement('pre');
+  codePeek.className = 'style-picker-copy-code';
+  codePeek.hidden = true;
+
+  copyBtn.addEventListener('click', async () => {
+    const styleSlug = toKey(nameField()) || 'unnamed';
+    const html = buildBlockTable(blockName, blockKey, styleSlug);
+    codePeek.textContent = html;
+    codePeek.hidden = false;
+    const ok = await copyBlockToClipboard(html);
+    copyMsg.textContent = ok
+      ? `Copied "${blockName}${styleSlug !== 'unnamed' ? ` (${styleSlug})` : ''}" — paste it into your page in DA.`
+      : 'Copy failed — select the markup below and copy it manually.';
+    copyMsg.classList.toggle('is-error', !ok);
+  });
+
+  copyWrap.append(copyBtn, copyMsg, codePeek);
+
+  container.append(controls, previewWrap, copyWrap);
   update();
 }
 
