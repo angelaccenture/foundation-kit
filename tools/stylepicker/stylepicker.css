@@ -178,12 +178,12 @@
 }
 
 /* Redesigned composer — chips, name field, live class preview */
-.style-picker-field--chips {
+.style-picker-field-chips {
   display: block;
   margin-bottom: 1rem;
 }
 
-.style-picker-field--chips .style-picker-field-label {
+.style-picker-field-chips .style-picker-field-label {
   display: block;
   margin-bottom: 0.4rem;
 }

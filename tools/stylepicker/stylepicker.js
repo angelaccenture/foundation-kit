@@ -183,7 +183,7 @@ function renderComposer(container, blockName, blockKey, options) {
 
   matches.forEach((opt) => {
     const field = document.createElement('div');
-    field.className = 'style-picker-field style-picker-field--chips';
+    field.className = 'style-picker-field style-picker-field-chips';
 
     const fieldLabel = document.createElement('span');
     fieldLabel.className = 'style-picker-field-label';
