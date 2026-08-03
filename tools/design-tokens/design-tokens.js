@@ -74,18 +74,10 @@ function toClassName(name) {
     : '';
 }
 
-// Sheet-provided option values (optional). Populated from an "options" tab in
-// the workbook if present: { key, values } where values = "a | b | c". When a
-// column has no sheet entry, we fall back to the hardcoded SELECT_OPTIONS below.
-// Additive: David's defaults still apply when no options tab exists.
+// Option values are sheet-driven: populated from the workbook's "options" tab
+// (key/Name + values/Options = "a | b | c"). No hardcoded lists — authors define
+// the choices in the sheet. See loadSheetOptions().
 const sheetOptions = {};
-
-const SELECT_OPTIONS = {
-  'layout-split': ['30-70', '40-60', '50-50', '60-40', '70-30'],
-  'horizontal-alignment': ['left', 'center', 'right'],
-  'vertical-alignment': ['top', 'center', 'bottom'],
-  'font-sizes': ['small', 'medium', 'large'],
-};
 
 /**
  * @param {string} column
@@ -93,19 +85,12 @@ const SELECT_OPTIONS = {
  */
 function getSelectOptions(column) {
   const slug = toClassName(column);
-  // Sheet-driven first (author-editable), then David's hardcoded fallback.
-  if (sheetOptions[slug]) return sheetOptions[slug];
-  if (slug.includes('layout') && slug.includes('split')) return SELECT_OPTIONS['layout-split'];
-  if (slug.includes('horizontal') && slug.includes('align')) return SELECT_OPTIONS['horizontal-alignment'];
-  if (slug.includes('vertical') && slug.includes('align')) return SELECT_OPTIONS['vertical-alignment'];
-  if (slug.includes('font') && slug.includes('size')) return SELECT_OPTIONS['font-sizes'];
-  return null;
+  return sheetOptions[slug] || null;
 }
 
 /**
- * Populate sheetOptions from an optional "options" tab in the workbook.
- * Rows: { key/Name, values/Options } where values is "a | b | c". No-op if the
- * tab is absent (single-sheet workbooks keep David's hardcoded defaults).
+ * Populate sheetOptions from the workbook's "options" tab.
+ * Rows: { key/Name, values/Options } where values is "a | b | c".
  * @param {object} payload the full workbook JSON
  */
 function loadSheetOptions(payload) {
