@@ -88,15 +88,18 @@ function isColorish(value) {
 }
 
 /**
- * Render each style option as a labeled control; picks compose a live summary.
+ * Redesigned composer — chips/swatches per option (not dropdowns). Author
+ * clicks to toggle values (single-select per option), names the style, and sees
+ * a live preview of the class + recipe they're building. Emits
+ * style-compose-change with the chosen recipe.
  * @param {Element} container
- * @param {string} blockName
+ * @param {string} blockName  human name, e.g. "Section Metadata"
+ * @param {string} blockKey   slug, e.g. "section-metadata"
  * @param {Array<Record<string,string>>} options
  */
-function renderComposer(container, blockName, options) {
+function renderComposer(container, blockName, blockKey, options) {
   container.textContent = '';
-  const key = toKey(blockName);
-  const matches = options.filter((o) => optionTargets(o, key));
+  const matches = options.filter((o) => optionTargets(o, blockKey));
 
   const heading = document.createElement('h2');
   heading.className = 'style-picker-results-title';
@@ -111,18 +114,67 @@ function renderComposer(container, blockName, options) {
     return;
   }
 
-  const chosen = {};
-  const summary = document.createElement('output');
-  summary.className = 'style-picker-summary';
+  const chosen = {}; // key -> { label, value }
 
-  function updateSummary() {
+  const nameLabel = document.createElement('span');
+  nameLabel.className = 'style-picker-field-label';
+  nameLabel.textContent = 'Style name';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.className = 'style-picker-name-input';
+  nameInput.placeholder = 'e.g. promo-hero';
+  const nameField = document.createElement('div');
+  nameField.className = 'style-picker-field';
+  nameField.append(nameLabel, nameInput);
+
+  const preview = document.createElement('div');
+  preview.className = 'style-picker-preview';
+
+  function slugName() {
+    return toKey(nameInput.value) || 'unnamed';
+  }
+
+  function updatePreview() {
     const parts = Object.entries(chosen).filter(([, v]) => v);
-    summary.textContent = parts.length
-      ? parts.map(([k, v]) => `${k}: ${v.label}`).join('   •   ')
-      : 'No options chosen yet.';
+    const className = `${blockKey}-${slugName()}`;
+    preview.innerHTML = '';
+
+    const classLine = document.createElement('code');
+    classLine.className = 'style-picker-preview-class';
+    classLine.textContent = `.${className}`;
+    preview.append(classLine);
+
+    if (parts.length) {
+      const recipe = document.createElement('div');
+      recipe.className = 'style-picker-recipe';
+      parts.forEach(([k, v]) => {
+        const pill = document.createElement('span');
+        pill.className = 'style-picker-recipe-pill';
+        if (isColorish(v.value)) {
+          const sw = document.createElement('span');
+          sw.className = 'style-picker-swatch';
+          sw.style.background = v.value;
+          pill.append(sw);
+        }
+        pill.append(document.createTextNode(`${k}: ${v.label}`));
+        recipe.append(pill);
+      });
+      preview.append(recipe);
+    } else {
+      const hint = document.createElement('span');
+      hint.className = 'style-picker-preview-hint';
+      hint.textContent = 'Pick options below to build the style.';
+      preview.append(hint);
+    }
+
     container.dispatchEvent(new CustomEvent('style-compose-change', {
       bubbles: true,
-      detail: { block: key, values: Object.fromEntries(parts.map(([k, v]) => [k, v.value])) },
+      detail: {
+        block: blockKey,
+        name: slugName(),
+        className,
+        recipe: Object.fromEntries(parts.map(([k, v]) => [k, v.value])),
+      },
     }));
   }
 
@@ -131,58 +183,62 @@ function renderComposer(container, blockName, options) {
 
   matches.forEach((opt) => {
     const field = document.createElement('div');
-    field.className = 'style-picker-field';
+    field.className = 'style-picker-field style-picker-field--chips';
 
-    const fieldLabel = document.createElement('label');
+    const fieldLabel = document.createElement('span');
     fieldLabel.className = 'style-picker-field-label';
     fieldLabel.textContent = opt.key;
 
-    const sel = document.createElement('select');
-    sel.className = 'style-picker-option-select';
-
-    const none = document.createElement('option');
-    none.value = '';
-    none.textContent = '—';
-    sel.append(none);
+    const chipRow = document.createElement('div');
+    chipRow.className = 'style-picker-chips';
 
     const tokens = parseValues(opt.values);
-    tokens.forEach((tok, i) => {
-      const o = document.createElement('option');
-      o.value = String(i);
-      o.textContent = tok.label;
-      sel.append(o);
-    });
+    tokens.forEach((tok) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'style-picker-chip';
+      chip.dataset.value = tok.value;
 
-    // Swatch preview for colorish selections.
-    const swatch = document.createElement('span');
-    swatch.className = 'style-picker-swatch style-picker-swatch-lg';
-    swatch.hidden = true;
-
-    sel.addEventListener('change', () => {
-      const tok = tokens[Number(sel.value)];
-      chosen[opt.key] = tok || null;
-      if (tok && isColorish(tok.value)) {
-        swatch.hidden = false;
-        swatch.style.background = tok.value;
-      } else {
-        swatch.hidden = true;
+      if (isColorish(tok.value)) {
+        const sw = document.createElement('span');
+        sw.className = 'style-picker-swatch';
+        sw.style.background = tok.value;
+        chip.append(sw);
       }
-      updateSummary();
+      chip.append(document.createTextNode(tok.label));
+
+      chip.addEventListener('click', () => {
+        const isActive = chip.classList.contains('is-active');
+        // single-select per option: clear siblings
+        chipRow.querySelectorAll('.style-picker-chip.is-active')
+          .forEach((c) => c.classList.remove('is-active'));
+        if (isActive) {
+          chosen[opt.key] = null; // toggle off
+        } else {
+          chip.classList.add('is-active');
+          chosen[opt.key] = tok;
+        }
+        updatePreview();
+      });
+
+      chipRow.append(chip);
     });
 
-    field.append(fieldLabel, sel, swatch);
+    field.append(fieldLabel, chipRow);
     controls.append(field);
   });
 
-  const summaryWrap = document.createElement('div');
-  summaryWrap.className = 'style-picker-summary-wrap';
-  const summaryLabel = document.createElement('span');
-  summaryLabel.className = 'style-picker-summary-label';
-  summaryLabel.textContent = 'Composed style';
-  summaryWrap.append(summaryLabel, summary);
+  const previewWrap = document.createElement('div');
+  previewWrap.className = 'style-picker-summary-wrap';
+  const previewLabel = document.createElement('span');
+  previewLabel.className = 'style-picker-summary-label';
+  previewLabel.textContent = 'Your style';
+  previewWrap.append(previewLabel, preview);
 
-  container.append(controls, summaryWrap);
-  updateSummary();
+  nameInput.addEventListener('input', updatePreview);
+
+  container.append(nameField, controls, previewWrap);
+  updatePreview();
 }
 
 /** @param {Element} host */
@@ -229,7 +285,7 @@ export default async function decorate(host) {
       bubbles: true,
       detail: { block: select.value, name: blockName },
     }));
-    if (select.value) renderComposer(results, blockName, library.options);
+    if (select.value) renderComposer(results, blockName, select.value, library.options);
   });
 }
 

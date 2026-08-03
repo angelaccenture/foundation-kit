@@ -176,3 +176,86 @@
   font-size: 0.95rem;
   color: #18181b;
 }
+
+/* Redesigned composer — chips, name field, live class preview */
+.style-picker-field--chips {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.style-picker-field--chips .style-picker-field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.style-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.style-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 999px;
+  background: #fff;
+  color: #18181b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
+}
+
+.style-picker-chip:hover {
+  border-color: #a1a1aa;
+}
+
+.style-picker-chip.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #2563eb inset;
+}
+
+.style-picker-name-input {
+  flex: 1;
+  max-width: 18rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.style-picker-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.style-picker-preview-class {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.style-picker-preview-hint {
+  color: #71717a;
+  font-size: 0.9rem;
+}
+
+.style-picker-recipe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.style-picker-recipe-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background: #f4f4f5;
+  font-size: 0.85rem;
+}
