@@ -69,7 +69,16 @@ function ruleFor(row) {
       vars.push(`${cssVar}:${hex || value}`);
     } else {
       // e.g. Layout Split -> data-layout-split, Font Sizes -> data-font-sizes
-      dataAttrs[`data-${toClassName(column)}`] = value.toLowerCase();
+      const attr = toClassName(column);
+      dataAttrs[`data-${attr}`] = value.toLowerCase();
+      // Layout split: also emit computed grid columns so ANY ratio renders,
+      // not just the ones with hardcoded CSS rules. e.g. "25-75" -> 25fr 75fr.
+      const split = /^(\d+)\s*-\s*(\d+)$/.exec(value.trim());
+      if (attr.includes('layout') && attr.includes('split') && split) {
+        // Carry a computed grid value; applied inline below so both banner
+        // variants (grid + flex) can switch to it for ANY ratio.
+        dataAttrs['data-split-columns'] = `${split[1]}fr ${split[2]}fr`;
+      }
     }
   });
 
@@ -109,7 +118,13 @@ export default async function applyDesignTokens(doc = document) {
     parsed.forEach(({ slug, dataAttrs }) => {
       if (!Object.keys(dataAttrs).length) return;
       doc.querySelectorAll(`.section.${slug},.${slug}`).forEach((el) => {
-        Object.entries(dataAttrs).forEach(([attr, val]) => el.setAttribute(attr, val));
+        Object.entries(dataAttrs).forEach(([attr, val]) => {
+          if (attr === 'data-split-columns') {
+            el.style.setProperty('--layout-split-columns', val);
+          } else {
+            el.setAttribute(attr, val);
+          }
+        });
       });
     });
   } catch (e) {

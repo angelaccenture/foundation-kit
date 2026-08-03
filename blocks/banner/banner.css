@@ -492,3 +492,27 @@
     line-height: var(--heading-line-height);
   }
 }
+
+/* -----------------------------------------------------------------------------
+ * Sheet-driven layout split (any ratio). The design-tokens consumer sets an
+ * inline --layout-split-columns (e.g. "25fr 75fr") on the block/section from
+ * the Layout Split value, so ANY ratio renders — not only the hardcoded
+ * data-layout-split rules above. Two-column breakpoint only.
+ * -------------------------------------------------------------------------- */
+@media (width >= 900px) {
+  /* Background variant is already a grid — override its columns when the var
+     is present (its own default otherwise). */
+  .banner-background[style*="--layout-split-columns"] .banner-content,
+  [style*="--layout-split-columns"] .banner-background .banner-content {
+    grid-template-columns: var(--layout-split-columns);
+  }
+
+  /* Image variant is flex by default; when the split var is present switch the
+     row to grid so the same fr ratio drives content : media. */
+  .banner-image[style*="--layout-split-columns"] > div,
+  [style*="--layout-split-columns"] .banner-image > div {
+    display: grid;
+    grid-template-columns: var(--layout-split-columns);
+    align-items: stretch;
+  }
+}
