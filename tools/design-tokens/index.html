@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design Tokens</title>
+  <link rel="stylesheet" href="/tools/design-tokens/design-tokens.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <main data-design-tokens-app>
+    <div class="sheet-toolbar">
+      <h1>Design Tokens</h1>
+      <button type="button" class="add-btn" data-add-btn title="Add token">+</button>
+    </div>
+
+    <p class="empty-state" data-empty-state hidden>No tokens found.</p>
+    <p class="error-state" data-error-state hidden></p>
+
+    <section class="banner-preview" data-banner-preview hidden>
+      <p class="preview-label">Preview · <strong data-preview-style></strong></p>
+      <div class="token-preview" data-preview-frame>
+        <div class="token-preview-content" data-preview-content>
+          <h3>This Week's Hot Deals:</h3>
+          <h2 data-preview-heading>Sample Heading</h2>
+          <span class="preview-button" data-preview-button>Shop the sale</span>
+        </div>
+        <div class="token-preview-image" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <div class="sheet-grid" data-sheet-grid hidden></div>
+  </main>
+
+  <script src="/tools/design-tokens/design-tokens.js" type="module"></script>
+</body>
+</html>
