@@ -12,6 +12,10 @@ async function loadSidekick() {
 (function loadLazy() {
   import('./utils/lazyhash.js');
   import('./utils/favicon.js');
+
+  // Design Tokens consumer: styles sections tagged with a named style from the
+  // shared style sheet (companion to /tools/design-tokens).
+  import('./design-tokens.js').then(({ default: applyDesignTokens }) => applyDesignTokens());
   import('./utils/footer.js').then(({ default: footer }) => footer());
 
   // Author facing tools
