@@ -6,7 +6,10 @@ import { ColorPicker, getContrastColor, sanitizeHexColor } from './color-picker.
 function normalizePayload(payload) {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
-  if (typeof payload === 'object' && Array.isArray(payload.data)) return payload.data;
+  // single-sheet: { data: [...] }
+  if (Array.isArray(payload.data)) return payload.data;
+  // multi-sheet: { data: { data: [...] }, options: {...} } — the "data" tab.
+  if (payload.data && Array.isArray(payload.data.data)) return payload.data.data;
   return [];
 }
 
