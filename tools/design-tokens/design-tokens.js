@@ -179,20 +179,34 @@ function normalizePath(path) {
 const DA_LIST_URL = 'https://admin.da.live/list/angelaccenture/foundation-kit/drafts/davids-folder/blocks';
 const DA_SITE_PREFIX = '/angelaccenture/foundation-kit';
 
+// Used if the DA list API is unreachable (offline, or blocked by a corporate
+// proxy). Keep roughly in sync with the folder above.
+const FALLBACK_SHEETS = [
+  { name: 'banner', path: '/drafts/davids-folder/blocks/banner' },
+  { name: 'hero', path: '/drafts/davids-folder/blocks/hero' },
+];
+
 /**
- * List the sheets in the DA blocks folder.
+ * List the sheets in the DA blocks folder. Times out after 5s so a blocked
+ * request can't hang the dropdown forever.
  * @returns {Promise<Array<{ name: string, path: string }>>} site-relative, no extension
  */
 async function loadSheetList() {
-  const response = await fetch(DA_LIST_URL);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const entries = await response.json();
-  return entries
-    .filter((entry) => entry.ext === 'json')
-    .map((entry) => ({
-      name: entry.name,
-      path: entry.path.replace(DA_SITE_PREFIX, '').replace(/\.json$/i, ''),
-    }));
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(DA_LIST_URL, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const entries = await response.json();
+    return entries
+      .filter((entry) => entry.ext === 'json')
+      .map((entry) => ({
+        name: entry.name,
+        path: entry.path.replace(DA_SITE_PREFIX, '').replace(/\.json$/i, ''),
+      }));
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 class DesignTokensApp {
@@ -240,9 +254,13 @@ class DesignTokensApp {
     try {
       sheets = await loadSheetList();
     } catch (error) {
-      // Folder unavailable — leave the dropdown empty rather than blocking the tool.
-      return;
+      // DA list unreachable (offline / blocked proxy / timeout). Fall back to the
+      // known sheets so the dropdown still works, and surface the real reason.
+      // eslint-disable-next-line no-console
+      console.warn('design-tokens: sheet list unavailable, using fallback —', error);
+      sheets = FALLBACK_SHEETS;
     }
+    if (!sheets.length) sheets = FALLBACK_SHEETS;
 
     this.pathSelect.innerHTML = '';
     const current = sheets.find((sheet) => normalizePath(sheet.path) === this.path);
