@@ -287,7 +287,9 @@ class DesignTokensApp {
       if (!this.pathSelect.value) return;
       const params = new URLSearchParams(window.location.search);
       params.set('path', this.pathSelect.value);
-      window.location.search = params.toString();
+      // Slashes are legal in a query value — keep the path readable rather than
+      // letting URLSearchParams percent-encode them (/ -> %2F).
+      window.location.search = params.toString().replace(/%2F/gi, '/');
     });
   }
 
