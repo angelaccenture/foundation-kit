@@ -216,6 +216,10 @@ class DesignTokensApp {
     this.sourceRows = [];
     this.selectedId = null;
     this.path = normalizePath(new URLSearchParams(window.location.search).get('path'));
+    // Which block the preview should mimic, from the sheet path
+    // (…/blocks/hero -> hero). Defaults to banner (the original shape).
+    const seg = (this.path || '').replace(/\.json$/i, '').split('/').pop();
+    this.blockType = seg === 'hero' ? 'hero' : 'banner';
     this.grid = root.querySelector('[data-sheet-grid]');
     this.preview = root.querySelector('[data-banner-preview]');
     this.previewFrame = root.querySelector('[data-preview-frame]');
@@ -363,12 +367,27 @@ class DesignTokensApp {
     const { content, media } = parseLayoutSplit(split);
 
     this.preview.hidden = false;
+    this.previewFrame.dataset.block = this.blockType;
+    // Swap the sample copy so the preview reads like the block it mimics.
+    const eyebrow = this.previewContent.querySelector('h3');
+    if (this.blockType === 'hero') {
+      if (eyebrow) eyebrow.textContent = 'Featured';
+      this.previewHeading.textContent = 'Hero Headline';
+      this.previewButton.textContent = 'Get started';
+    } else {
+      if (eyebrow) eyebrow.textContent = "This Week's Hot Deals:";
+      this.previewHeading.textContent = 'Sample Heading';
+      this.previewButton.textContent = 'Shop the sale';
+    }
     this.previewStyle.textContent = styleName;
     this.previewFrame.dataset.split = split;
     this.previewFrame.dataset.horizontal = horizontal;
     this.previewFrame.dataset.vertical = vertical;
     this.previewFrame.dataset.fontSize = fontSize;
-    this.previewFrame.style.gridTemplateColumns = `${content}fr ${media}fr`;
+    // Hero is one full-bleed column; banner uses the layout split.
+    this.previewFrame.style.gridTemplateColumns = this.blockType === 'hero'
+      ? '1fr'
+      : `${content}fr ${media}fr`;
 
     let alignItems = 'flex-start';
     if (horizontal === 'center') alignItems = 'center';
@@ -378,14 +397,28 @@ class DesignTokensApp {
     if (vertical === 'top') justifyContent = 'flex-start';
     else if (vertical === 'bottom') justifyContent = 'flex-end';
 
-    this.previewContent.style.backgroundColor = bg;
-    this.previewContent.style.backgroundImage = '';
-    this.previewContent.style.color = fg;
     this.previewContent.style.alignItems = alignItems;
     this.previewContent.style.justifyContent = justifyContent;
     this.previewContent.style.textAlign = horizontal;
 
-    this.previewHeading.style.color = accent;
+    if (this.blockType === 'hero') {
+      // Hero: background tints a full-bleed readability scrim; text is the
+      // foreground colour; the CTA takes the accent (mirrors the hero block).
+      this.previewContent.style.backgroundColor = '';
+      this.previewContent.style.backgroundImage = bg
+        ? `linear-gradient(90deg, color-mix(in srgb, ${bg} 80%, transparent), `
+          + `color-mix(in srgb, ${bg} 20%, transparent))`
+        : '';
+      this.previewContent.style.color = fg;
+      this.previewHeading.style.color = fg;
+    } else {
+      // Banner: solid background fill; heading in the accent colour.
+      this.previewContent.style.backgroundColor = bg;
+      this.previewContent.style.backgroundImage = '';
+      this.previewContent.style.color = fg;
+      this.previewHeading.style.color = accent;
+    }
+
     this.previewButton.style.backgroundColor = accent;
   }
 

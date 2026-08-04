@@ -138,6 +138,29 @@ main {
   background-position: center;
 }
 
+/* Hero preview — a single full-bleed image with the content (scrim + text)
+ * overlaid on top, instead of banner's side-by-side split. */
+.token-preview[data-block='hero'] {
+  grid-template-columns: 1fr;
+  min-height: 13rem;
+}
+
+.token-preview[data-block='hero'] .token-preview-image {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Content overlays the image; its scrim gradient (set inline in JS) fades
+ * left→right so the overlaid text stays readable over the image. */
+.token-preview[data-block='hero'] .token-preview-content {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  padding: 1.25rem 1.5rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .sheet-toolbar {
   display: flex;
   align-items: center;
