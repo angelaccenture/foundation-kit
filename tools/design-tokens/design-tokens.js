@@ -571,6 +571,46 @@ class DesignTokensApp {
     return cell;
   }
 
+  /**
+   * Copy one style row as tab-separated values in the sheet's column order,
+   * so it pastes straight across a row of cells in the DA sheet.
+   * @param {{ values: Record<string, string> }} token
+   * @param {HTMLButtonElement} btn the button, for transient feedback
+   */
+  async copyRow(token, btn) {
+    const tsv = this.columns.map((column) => (token.values[column] || '').trim()).join('\t');
+    const done = (label) => {
+      const original = 'Copy';
+      btn.textContent = label;
+      btn.classList.add('is-copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('is-copied');
+      }, 1200);
+    };
+    try {
+      await navigator.clipboard.writeText(tsv);
+      done('Copied!');
+    } catch (error) {
+      // Clipboard API blocked (permissions / insecure context) — fall back to
+      // a hidden textarea + execCommand so copy still works.
+      const ta = document.createElement('textarea');
+      ta.value = tsv;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.append(ta);
+      ta.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch (e) {
+        ok = false;
+      }
+      ta.remove();
+      done(ok ? 'Copied!' : 'Copy failed');
+    }
+  }
+
   render() {
     this.colorPicker.close();
     this.grid.innerHTML = '';
@@ -587,7 +627,7 @@ class DesignTokensApp {
       this.selectedId = this.tokens[0].id;
     }
 
-    this.grid.style.gridTemplateColumns = `repeat(${this.columns.length}, minmax(5rem, 1fr)) 2.25rem`;
+    this.grid.style.gridTemplateColumns = `repeat(${this.columns.length}, minmax(5rem, 1fr)) 4.75rem`;
 
     const headerRow = document.createElement('div');
     headerRow.className = 'sheet-header';
@@ -618,16 +658,16 @@ class DesignTokensApp {
 
       const actions = document.createElement('div');
       actions.className = 'cell actions';
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'remove-btn';
-      removeBtn.textContent = '×';
-      removeBtn.title = 'Remove token';
-      removeBtn.addEventListener('click', (event) => {
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = 'Copy';
+      copyBtn.title = 'Copy this row (tab-separated) to paste into the sheet';
+      copyBtn.addEventListener('click', (event) => {
         event.stopPropagation();
-        this.removeToken(token.id);
+        this.copyRow(token, copyBtn);
       });
-      actions.append(removeBtn);
+      actions.append(copyBtn);
       row.append(actions);
       this.grid.append(row);
     });

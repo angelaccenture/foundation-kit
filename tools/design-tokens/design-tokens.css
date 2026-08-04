@@ -205,7 +205,8 @@ h1 {
 }
 
 .add-btn,
-.remove-btn {
+.remove-btn,
+.copy-btn {
   font: inherit;
   cursor: pointer;
   border: none;
@@ -253,6 +254,28 @@ h1 {
 .sheet-row:hover .remove-btn,
 .sheet-row.is-selected .remove-btn {
   opacity: 1;
+}
+
+.copy-btn {
+  padding: 0.3rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dt-accent);
+  background: var(--dt-accent-soft);
+  border-radius: 6px;
+}
+
+.copy-btn:hover {
+  background: rgb(37 99 235 / 14%);
+}
+
+.copy-btn:active {
+  transform: scale(0.96);
+}
+
+.copy-btn.is-copied {
+  color: #fff;
+  background: var(--dt-accent);
 }
 
 .empty-state,
