@@ -11,8 +11,10 @@
   <main data-design-tokens-app>
     <div class="sheet-toolbar">
       <h1>Design Tokens</h1>
-      <select class="path-select" data-path-select aria-label="Sheet"></select>
-      <button type="button" class="add-btn" data-add-btn title="Add token">+</button>
+      <div class="path-picker">
+        <label class="path-label" for="path-select">Blocks:</label>
+        <select class="path-select" id="path-select" data-path-select></select>
+      </div>
     </div>
 
     <p class="empty-state" data-empty-state hidden>No tokens found.</p>
@@ -31,6 +33,10 @@
     </section>
 
     <div class="sheet-grid" data-sheet-grid hidden></div>
+
+    <div class="add-token-row">
+      <button type="button" class="add-btn" data-add-btn title="Add token">+</button>
+    </div>
   </main>
 
   <script src="/tools/design-tokens/design-tokens.js" type="module"></script>

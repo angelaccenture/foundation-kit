@@ -146,8 +146,19 @@ main {
   margin-bottom: 1rem;
 }
 
-.path-select {
+.path-picker {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.path-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.path-select {
   font: inherit;
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--dt-border, #d5d5d5);
@@ -155,6 +166,11 @@ main {
   background: var(--dt-surface, #fff);
   color: inherit;
   cursor: pointer;
+}
+
+.add-token-row {
+  display: flex;
+  margin-top: 0.75rem;
 }
 
 h1 {
