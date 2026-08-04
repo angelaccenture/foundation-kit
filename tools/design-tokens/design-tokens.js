@@ -175,35 +175,34 @@ function normalizePath(path) {
   return /\.json$/i.test(path) ? path : `${path}.json`;
 }
 
-// DA folder whose sheets populate the path dropdown.
-const DA_LIST_URL = 'https://admin.da.live/list/angelaccenture/foundation-kit/drafts/davids-folder/blocks';
-const DA_SITE_PREFIX = '/angelaccenture/foundation-kit';
+// Sheet that lists the blocks shown in the dropdown. Same-origin (relative)
+// so hex reads hex's copy, main reads main's — and no cross-origin/admin
+// dependency that a corporate proxy could block.
+const BLOCK_LIST_URL = '/drafts/davids-folder/block-list.json';
 
-// Used if the DA list API is unreachable (offline, or blocked by a corporate
-// proxy). Keep roughly in sync with the folder above.
+// Used if block-list.json can't be loaded, so the dropdown still works.
 const FALLBACK_SHEETS = [
-  { name: 'banner', path: '/drafts/davids-folder/blocks/banner' },
-  { name: 'hero', path: '/drafts/davids-folder/blocks/hero' },
+  { name: 'Banner', path: '/drafts/davids-folder/blocks/banner' },
+  { name: 'Hero', path: '/drafts/davids-folder/blocks/hero' },
 ];
 
 /**
- * List the sheets in the DA blocks folder. Times out after 5s so a blocked
- * request can't hang the dropdown forever.
- * @returns {Promise<Array<{ name: string, path: string }>>} site-relative, no extension
+ * Load the block list. Each row: { name, path }. `name` is the dropdown label;
+ * `path` is used verbatim as the ?path= value (author controls it in the sheet).
+ * Times out after 5s so a hung request can't stall the dropdown.
+ * @returns {Promise<Array<{ name: string, path: string }>>}
  */
 async function loadSheetList() {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const response = await fetch(DA_LIST_URL, { signal: controller.signal });
+    const response = await fetch(BLOCK_LIST_URL, { signal: controller.signal });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const entries = await response.json();
-    return entries
-      .filter((entry) => entry.ext === 'json')
-      .map((entry) => ({
-        name: entry.name,
-        path: entry.path.replace(DA_SITE_PREFIX, '').replace(/\.json$/i, ''),
-      }));
+    const payload = await response.json();
+    const rows = Array.isArray(payload.data) ? payload.data : [];
+    return rows
+      .filter((row) => row.name && row.path)
+      .map((row) => ({ name: row.name, path: row.path }));
   } finally {
     clearTimeout(timer);
   }
@@ -269,7 +268,7 @@ class DesignTokensApp {
     if (!current) {
       const placeholder = document.createElement('option');
       placeholder.value = '';
-      placeholder.textContent = 'Choose a sheet…';
+      placeholder.textContent = 'Choose a block…';
       placeholder.disabled = true;
       placeholder.selected = true;
       this.pathSelect.append(placeholder);
