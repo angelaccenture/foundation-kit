@@ -175,6 +175,26 @@ function normalizePath(path) {
   return /\.json$/i.test(path) ? path : `${path}.json`;
 }
 
+// DA folder whose sheets populate the path dropdown.
+const DA_LIST_URL = 'https://admin.da.live/list/angelaccenture/foundation-kit/drafts/davids-folder/blocks';
+const DA_SITE_PREFIX = '/angelaccenture/foundation-kit';
+
+/**
+ * List the sheets in the DA blocks folder.
+ * @returns {Promise<Array<{ name: string, path: string }>>} site-relative, no extension
+ */
+async function loadSheetList() {
+  const response = await fetch(DA_LIST_URL);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const entries = await response.json();
+  return entries
+    .filter((entry) => entry.ext === 'json')
+    .map((entry) => ({
+      name: entry.name,
+      path: entry.path.replace(DA_SITE_PREFIX, '').replace(/\.json$/i, ''),
+    }));
+}
+
 class DesignTokensApp {
   constructor(root) {
     this.root = root;
@@ -194,7 +214,9 @@ class DesignTokensApp {
     this.errorState = root.querySelector('[data-error-state]');
     this.colorPicker = new ColorPicker();
 
+    this.pathSelect = root.querySelector('[data-path-select]');
     root.querySelector('[data-add-btn]').addEventListener('click', () => this.addToken());
+    this.populatePathSelect();
     this.loadTokens();
   }
 
@@ -209,6 +231,46 @@ class DesignTokensApp {
   clearError() {
     this.errorState.hidden = true;
     this.errorState.textContent = '';
+  }
+
+  async populatePathSelect() {
+    if (!this.pathSelect) return;
+
+    let sheets;
+    try {
+      sheets = await loadSheetList();
+    } catch (error) {
+      // Folder unavailable — leave the dropdown empty rather than blocking the tool.
+      return;
+    }
+
+    this.pathSelect.innerHTML = '';
+    const current = sheets.find((sheet) => normalizePath(sheet.path) === this.path);
+
+    // If the current sheet isn't in this folder, show a non-lying placeholder.
+    if (!current) {
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Choose a sheet…';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      this.pathSelect.append(placeholder);
+    }
+
+    sheets.forEach((sheet) => {
+      const option = document.createElement('option');
+      option.value = sheet.path;
+      option.textContent = sheet.name;
+      option.selected = sheet === current;
+      this.pathSelect.append(option);
+    });
+
+    this.pathSelect.addEventListener('change', () => {
+      if (!this.pathSelect.value) return;
+      const params = new URLSearchParams(window.location.search);
+      params.set('path', this.pathSelect.value);
+      window.location.search = params.toString();
+    });
   }
 
   async loadTokens() {
