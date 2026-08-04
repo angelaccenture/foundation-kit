@@ -223,3 +223,101 @@
     }
   }
 }
+
+/* -----------------------------------------------------------------------------
+ * Design-token styles (ADDITIVE) — themes a hero tagged with a Style from the
+ * design-tokens sheet (blocks/hero.json), via scripts/design-tokens.js.
+ *
+ * Colours arrive as CSS variables that cascade from the tagged section; layout
+ * choices arrive as data-* attributes mirrored onto the section or block. Every
+ * rule falls back to hero's EXISTING value, so an untagged hero renders exactly
+ * as before — nothing above this comment is modified.
+ *
+ * Consumed:  --accent-color (CTA link) · --foreground-color (text)
+ *            --background-color (gradient scrim tint) · data-font-sizes
+ *            data-horizontal-alignment · data-vertical-alignment
+ * Ignored:   Layout Split — hero has no split media column (banner-only).
+ * -------------------------------------------------------------------------- */
+
+/* Redefines the scrim vars on the parent .hero (intentional second .hero rule —
+ * NOT merged into David's block above, to keep this section purely additive).
+ * Defining on .hero (not .hero-foreground) lets David's more-specific .light
+ * override still win via normal cascade. Untagged, --background-color is unset
+ * so this resolves to rgb(0 0 0 / 80%|20%) — identical to the original gradient. */
+/* stylelint-disable-next-line no-duplicate-selectors */
+.hero {
+  --gradient-start: color-mix(in srgb, var(--background-color, rgb(var(--color-dark-base))) 80%, transparent);
+  --gradient-end: color-mix(in srgb, var(--background-color, rgb(var(--color-dark-base))) 20%, transparent);
+}
+
+/* Foreground → heading + body text colour (fallback inherits current colour). */
+.hero .hero-foreground .hero-heading,
+.hero .hero-foreground .hero-detail,
+.hero .hero-foreground p {
+  color: var(--foreground-color, inherit);
+}
+
+/* Accent → CTA link colour (hero links are bare <a>; fallback inherits). */
+.hero .hero-foreground .fg-text a {
+  color: var(--accent-color, inherit);
+}
+
+/* Horizontal alignment — attribute may sit on the section or the block. */
+:is([data-horizontal-alignment='left'] .hero, .hero[data-horizontal-alignment='left']) .hero-foreground {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+:is([data-horizontal-alignment='center'] .hero, .hero[data-horizontal-alignment='center']) .hero-foreground {
+  justify-content: center;
+  text-align: center;
+}
+
+:is([data-horizontal-alignment='right'] .hero, .hero[data-horizontal-alignment='right']) .hero-foreground {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Vertical alignment — foreground is a flex/grid box; align-items works in both. */
+:is([data-vertical-alignment='top'] .hero, .hero[data-vertical-alignment='top']) .hero-foreground {
+  align-items: flex-start;
+}
+
+:is([data-vertical-alignment='center'] .hero, .hero[data-vertical-alignment='center']) .hero-foreground {
+  align-items: center;
+}
+
+:is([data-vertical-alignment='bottom'] .hero, .hero[data-vertical-alignment='bottom']) .hero-foreground {
+  align-items: flex-end;
+}
+
+/* Font sizes — scales the hero heading + detail; mirrors banner's small/medium/large. */
+:is([data-font-sizes='small'] .hero, .hero[data-font-sizes='small']) .hero-heading {
+  font-size: var(--heading-font-size-l);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='small'] .hero, .hero[data-font-sizes='small']) .hero-detail {
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+}
+
+:is([data-font-sizes='medium'] .hero, .hero[data-font-sizes='medium']) .hero-heading {
+  font-size: var(--heading-font-size-xl);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='medium'] .hero, .hero[data-font-sizes='medium']) .hero-detail {
+  font-size: var(--body-font-size-l);
+  line-height: var(--body-line-height);
+}
+
+:is([data-font-sizes='large'] .hero, .hero[data-font-sizes='large']) .hero-heading {
+  font-size: var(--heading-font-size-xxl);
+  line-height: var(--heading-line-height);
+}
+
+:is([data-font-sizes='large'] .hero, .hero[data-font-sizes='large']) .hero-detail {
+  font-size: var(--body-font-size-xl);
+  line-height: var(--body-line-height);
+}
