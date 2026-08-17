@@ -5,7 +5,8 @@ Additional Features:
 2. Enhanced Advanced Tabs (count and hastag support), New Advanced Carousel, New Adanced Accordion
 3. Block Template Support (to use template as page component - for layout and to lessen the use of custom blocks)
 4. IP - Core Blocks -- Teaser, Advanced-Text, Breadcrumbs
-5. IP - Enhanced Quick Edit (for layout mode)
+5. IP - mobile/tablet options for Section grid
+6. IP - Enhanced Quick Edit (for layout mode)
 
 # Author Kit
 For projects that want a few more batteries. Built by the team who brought you da.live and adobe.com.
