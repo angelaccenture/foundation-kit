@@ -7,6 +7,7 @@ Additional Features:
 4. IP - Core Blocks -- Teaser, Advanced-Text, Breadcrumbs
 5. IP - mobile/tablet options for Section grid
 6. IP - Enhanced Quick Edit (for layout mode)
+7. IP - Advanced Text (for having span tags within parent tags)
 
 # Author Kit
 For projects that want a few more batteries. Built by the team who brought you da.live and adobe.com.
