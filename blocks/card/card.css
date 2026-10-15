@@ -83,3 +83,16 @@
     }
   }
 }
+
+/* Outside a grid section, keep card proportions instead of filling the row */
+@media (width >= 600px) {
+  .section:not(.grid) .card {
+    max-width: calc(var(--grid-column-width) * 6);
+  }
+}
+
+@media (width >= 900px) {
+  .section:not(.grid) .card {
+    max-width: calc(var(--grid-column-width) * 4);
+  }
+}
