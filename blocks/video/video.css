@@ -1,0 +1,8 @@
+.video {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  padding: var(--spacing-l);
+  background-color: var(--color-gray-200);
+  text-align: center;
+}

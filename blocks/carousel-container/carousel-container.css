@@ -1,0 +1,135 @@
+.carousel-container {
+  position: relative;
+}
+
+.carousel-container .carousel-container-missing {
+  padding: var(--spacing-l);
+  border: 2px dashed var(--color-gray-500);
+  text-align: center;
+}
+
+/* Nav bar: prev, tabs, play/pause, next */
+.carousel-container .carousel-container-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-m);
+  padding: var(--spacing-m) 0;
+}
+
+.carousel-container .carousel-container-nav button {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.carousel-container .carousel-container-prev,
+.carousel-container .carousel-container-next {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-gray-200);
+}
+
+.carousel-container .carousel-container-prev:hover,
+.carousel-container .carousel-container-next:hover,
+.carousel-container .carousel-container-prev:focus-visible,
+.carousel-container .carousel-container-next:focus-visible {
+  background-color: var(--color-gray-300);
+}
+
+.carousel-container .carousel-container-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Arrows */
+.carousel-container .carousel-container-prev::after,
+.carousel-container .carousel-container-next::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 2px);
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--color-text);
+  border-bottom: 0;
+  border-left: 0;
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.carousel-container .carousel-container-next::after {
+  left: calc(50% - 2px);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Dot tabs */
+.carousel-container .carousel-container-tabs {
+  display: flex;
+  gap: var(--spacing-s);
+}
+
+.carousel-container .carousel-container-tabs button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--color-gray-300);
+}
+
+.carousel-container .carousel-container-tabs button[aria-selected="true"],
+.carousel-container .carousel-container-tabs button:hover,
+.carousel-container .carousel-container-tabs button:focus-visible {
+  background-color: var(--color-text);
+}
+
+/* Play/pause */
+.carousel-container .carousel-container-play {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-text);
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.carousel-container .carousel-container-play:hover,
+.carousel-container .carousel-container-play:focus-visible {
+  background-color: var(--color-gray-200);
+}
+
+.carousel-container .carousel-container-play.is-playing::before,
+.carousel-container .carousel-container-play.is-playing::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  background-color: var(--color-text);
+  transform: translateY(-50%);
+}
+
+.carousel-container .carousel-container-play.is-playing::before {
+  left: calc(50% - 3px);
+}
+
+.carousel-container .carousel-container-play.is-playing::after {
+  left: calc(50% + 1px);
+}
+
+.carousel-container .carousel-container-play:not(.is-playing)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 1px);
+  border-style: solid;
+  border-width: 5px 0 5px 9px;
+  border-color: transparent transparent transparent var(--color-text);
+  transform: translate(-50%, -50%);
+}
+
+[dir="rtl"] .carousel-container .carousel-container-nav {
+  flex-direction: row-reverse;
+}
