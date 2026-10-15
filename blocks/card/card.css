@@ -86,13 +86,13 @@
 
 /* Outside a grid section, size like one grid column instead of filling the row */
 @media (width >= 600px) {
-  .section:not(.grid) .card {
+  :where(.section:not(.grid)) .card {
     max-width: calc(100% / 2);
   }
 }
 
 @media (width >= 900px) {
-  .section:not(.grid) .card {
+  :where(.section:not(.grid)) .card {
     max-width: calc(100% / 3);
   }
 }

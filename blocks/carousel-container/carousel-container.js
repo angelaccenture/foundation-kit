@@ -12,7 +12,7 @@ function getSlideRows(el) {
     const [labelCol, nameCol] = row.children;
     return {
       label: labelCol?.textContent.trim() || `Slide ${idx + 1}`,
-      name: toBlockName(nameCol?.textContent || ''),
+      names: (nameCol?.textContent || '').split(',').map(toBlockName).filter(Boolean),
     };
   });
 }
@@ -25,16 +25,23 @@ function getCandidates(el) {
   return next === -1 ? after : after.slice(0, next);
 }
 
+// Each row claims the first unclaimed block below for every name it lists
 function claimSlides(rows, candidates) {
   const claimed = new Set();
   return rows.map((row, idx) => {
-    const block = candidates.find((cand) => !claimed.has(cand) && cand.classList[0] === row.name);
-    if (block) {
-      claimed.add(block);
-      return { ...row, block };
-    }
-    log(`Carousel container, slide ${idx + 1}: no "${row.name}" block found below it in this section.`);
-    return { ...row, block: null };
+    const blocks = [];
+    const missing = [];
+    row.names.forEach((name) => {
+      const block = candidates.find((cand) => !claimed.has(cand) && cand.classList[0] === name);
+      if (block) {
+        claimed.add(block);
+        blocks.push(block);
+      } else {
+        missing.push(name);
+        log(`Carousel container, slide ${idx + 1}: no "${name}" block found below it in this section.`);
+      }
+    });
+    return { ...row, blocks, missing };
   });
 }
 
@@ -46,12 +53,15 @@ function createPanel(slide, idx, id) {
   panel.setAttribute('aria-roledescription', 'slide');
   panel.setAttribute('aria-labelledby', `${id}-tab-${idx}`);
   panel.hidden = idx > 0;
-  if (slide.block) {
-    panel.append(slide.block);
-  } else {
+  if (slide.blocks.length > 1) {
+    panel.classList.add('carousel-container-group');
+    panel.style.setProperty('--group-size', slide.blocks.length);
+  }
+  panel.append(...slide.blocks);
+  if (slide.missing.length && ENV !== 'prod') {
     const missing = document.createElement('p');
     missing.className = 'carousel-container-missing';
-    missing.textContent = `${slide.label}: no "${slide.name}" block found below this carousel.`;
+    missing.textContent = `${slide.label}: no "${slide.missing.join('", "')}" block found below this carousel.`;
     panel.append(missing);
   }
   return panel;
@@ -80,7 +90,7 @@ export default function init(el) {
   instanceCount += 1;
 
   const slides = claimSlides(getSlideRows(el), getCandidates(el))
-    .filter((slide) => slide.block || ENV !== 'prod');
+    .filter((slide) => slide.blocks.length || ENV !== 'prod');
   if (!slides.length) {
     log('Carousel container: no slides found. Add a row per slide: label, then block name.', el);
     return;

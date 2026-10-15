@@ -2,6 +2,22 @@
   position: relative;
 }
 
+/* Several blocks in one slide: stacked on phones, side by side from 900px */
+.carousel-container .carousel-container-group:not([hidden]) {
+  display: grid;
+  gap: var(--spacing-l);
+}
+
+.carousel-container .carousel-container-group > * {
+  max-width: none;
+}
+
+@media (width >= 900px) {
+  .carousel-container .carousel-container-group {
+    grid-template-columns: repeat(var(--group-size), 1fr);
+  }
+}
+
 .carousel-container .carousel-container-missing {
   padding: var(--spacing-l);
   border: 2px dashed var(--color-gray-500);
